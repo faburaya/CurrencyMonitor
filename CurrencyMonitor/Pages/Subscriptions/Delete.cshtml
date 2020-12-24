@@ -2,7 +2,7 @@
 @model CurrencyMonitor.Pages.Subscriptions.DeleteModel
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Löschen";
 }
 
 <h1>Löschen</h1>
@@ -41,6 +41,6 @@
     <form method="post">
         <input type="hidden" asp-for="SubscriptionForExchangeRate.ID" />
         <input type="submit" value="Löschen" class="btn btn-danger" /> |
-        <a asp-page="./Index">Zurück nach alle Abonnements</a>
+        <a asp-page="./Index">Zurück zu allen Abonnements</a>
     </form>
 </div>
