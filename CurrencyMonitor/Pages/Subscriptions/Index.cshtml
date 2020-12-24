@@ -1,0 +1,54 @@
+﻿@page
+@model CurrencyMonitor.Pages.Subscriptions.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Alle Abonnements</h1>
+
+<p>
+    <a asp-page="Create">Erstellen Sie ein neues Abonnement</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.SubscriptionForExchangeRate[0].Label)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SubscriptionForExchangeRate[0].EMailAddress)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SubscriptionForExchangeRate[0].CodeCurrencyToSell)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SubscriptionForExchangeRate[0].CodeCurrencyToBuy)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.SubscriptionForExchangeRate) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Label)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EMailAddress)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CodeCurrencyToSell)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CodeCurrencyToBuy)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.ID">Bearbeiten</a> |
+                <a asp-page="./Details" asp-route-id="@item.ID">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.ID">Löschen</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
