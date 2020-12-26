@@ -16,5 +16,6 @@ namespace CurrencyMonitor.Data
 
         public DbSet<CurrencyMonitor.DataModels.SubscriptionForExchangeRate> SubscriptionForExchangeRate { get; set; }
 
+        public DbSet<CurrencyMonitor.DataModels.RecognizedCurrency> RecognizedCurrency { get; set; }
     }
 }

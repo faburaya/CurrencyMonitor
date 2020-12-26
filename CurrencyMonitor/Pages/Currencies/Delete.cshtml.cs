@@ -12,9 +12,9 @@ namespace CurrencyMonitor.Pages.Currencies
 {
     public class DeleteModel : PageModel
     {
-        private readonly CurrencyMonitor.Data.RecognizedCurrencyContext _context;
+        private readonly CurrencyMonitor.Data.CurrencyMonitorContext _context;
 
-        public DeleteModel(CurrencyMonitor.Data.RecognizedCurrencyContext context)
+        public DeleteModel(CurrencyMonitor.Data.CurrencyMonitorContext context)
         {
             _context = context;
         }

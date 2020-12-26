@@ -12,9 +12,9 @@ namespace CurrencyMonitor.Pages.Currencies
 {
     public class DetailsModel : PageModel
     {
-        private readonly CurrencyMonitor.Data.RecognizedCurrencyContext _context;
+        private readonly CurrencyMonitor.Data.CurrencyMonitorContext _context;
 
-        public DetailsModel(CurrencyMonitor.Data.RecognizedCurrencyContext context)
+        public DetailsModel(CurrencyMonitor.Data.CurrencyMonitorContext context)
         {
             _context = context;
         }

@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace CurrencyMonitor.Migrations.RecognizedCurrency
+namespace CurrencyMonitor.Migrations
 {
-    [DbContext(typeof(RecognizedCurrencyContext))]
-    [Migration("20201226194008_initialcreate")]
-    partial class initialcreate
+    [DbContext(typeof(CurrencyMonitorContext))]
+    [Migration("20201226200954_RecognizedCurrencies")]
+    partial class RecognizedCurrencies
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -42,6 +42,30 @@ namespace CurrencyMonitor.Migrations.RecognizedCurrency
                     b.HasKey("ID");
 
                     b.ToTable("RecognizedCurrency");
+                });
+
+            modelBuilder.Entity("CurrencyMonitor.DataModels.SubscriptionForExchangeRate", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<string>("CodeCurrencyToBuy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CodeCurrencyToSell")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EMailAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Label")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("SubscriptionForExchangeRate");
                 });
 #pragma warning restore 612, 618
         }

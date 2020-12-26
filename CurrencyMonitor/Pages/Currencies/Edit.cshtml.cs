@@ -13,9 +13,9 @@ namespace CurrencyMonitor.Pages.Currencies
 {
     public class EditModel : PageModel
     {
-        private readonly CurrencyMonitor.Data.RecognizedCurrencyContext _context;
+        private readonly CurrencyMonitor.Data.CurrencyMonitorContext _context;
 
-        public EditModel(CurrencyMonitor.Data.RecognizedCurrencyContext context)
+        public EditModel(CurrencyMonitor.Data.CurrencyMonitorContext context)
         {
             _context = context;
         }

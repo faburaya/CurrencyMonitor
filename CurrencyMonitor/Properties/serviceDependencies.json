@@ -3,10 +3,6 @@
     "mssql1": {
       "type": "mssql",
       "connectionId": "CurrencyMonitorContext"
-    },
-    "mssql2": {
-      "type": "mssql",
-      "connectionId": "RecognizedCurrencyContext"
     }
   }
 }

@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace CurrencyMonitor.Migrations.RecognizedCurrency
+namespace CurrencyMonitor.Migrations
 {
-    public partial class initialcreate : Migration
+    public partial class RecognizedCurrencies : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
