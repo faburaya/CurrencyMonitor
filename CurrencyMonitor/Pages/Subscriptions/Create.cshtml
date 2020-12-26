@@ -24,12 +24,16 @@
                 <span asp-validation-for="SubscriptionForExchangeRate.EMailAddress" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="SubscriptionForExchangeRate.CodeCurrencyToSell" class="control-label"></label>
+                <label class="control-label">
+                    @Html.DisplayNameFor(model => model.SubscriptionForExchangeRate.CodeCurrencyToSell) (<a asp-page="/Currencies/Index">nicht vorhanden?</a>)
+                </label>
                 <input asp-for="SubscriptionForExchangeRate.CodeCurrencyToSell" class="form-control" />
                 <span asp-validation-for="SubscriptionForExchangeRate.CodeCurrencyToSell" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="SubscriptionForExchangeRate.CodeCurrencyToBuy" class="control-label"></label>
+                <label class="control-label">
+                    @Html.DisplayNameFor(model => model.SubscriptionForExchangeRate.CodeCurrencyToBuy) (<a asp-page="/Currencies/Index">nicht vorhanden?</a>)
+                </label>
                 <input asp-for="SubscriptionForExchangeRate.CodeCurrencyToBuy" class="form-control" />
                 <span asp-validation-for="SubscriptionForExchangeRate.CodeCurrencyToBuy" class="text-danger"></span>
             </div>

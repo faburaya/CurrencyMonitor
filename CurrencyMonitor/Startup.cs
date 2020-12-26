@@ -30,6 +30,9 @@ namespace CurrencyMonitor
 
             services.AddDbContext<CurrencyMonitorContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("CurrencyMonitorContext")));
+
+            services.AddDbContext<RecognizedCurrencyContext>(options =>
+                    options.UseSqlServer(Configuration.GetConnectionString("RecognizedCurrencyContext")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
