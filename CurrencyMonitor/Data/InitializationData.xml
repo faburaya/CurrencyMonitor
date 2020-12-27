@@ -1,0 +1,170 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<deployment>
+  <currencies>
+    <entry code="AED" name="Dirham" symbol="AED" country="Vereinigte Arabische Emirate" />
+    <entry code="AFN" name="Afghani" symbol="؋" country="Afghanistan" />
+    <entry code="ALL" name="Lek" symbol="Lek" country="Albanien" />
+    <entry code="AMD" name="Dram" symbol="Lek" country="Armenien" />
+    <entry code="ANG" name="Antillen-Gulden" symbol="ƒ" country="Curaçao, Sint Maarten" />
+    <entry code="AOA" name="Kwanza" symbol="ƒ" country="Angola" />
+    <entry code="ARS" name="Peso" symbol="$" country="Argentinien" />
+    <entry code="AUD" name="Dollar" symbol="$" country="Australien, Kiribati, Nauru, Tuvalu" />
+    <entry code="AWG" name="Florin" symbol="ƒ" country="Aruba" />
+    <entry code="AZN" name="Aserbaidschan-Manat" symbol="₼" country="Aserbaidschan" />
+    <entry code="BAM" name="Konvertible Mark" symbol="KM" country="Bosnien und Herzegowina" />
+    <entry code="BBD" name="Dollar" symbol="$" country="Barbados" />
+    <entry code="BDT" name="Taka" symbol="$" country="Bangladesch" />
+    <entry code="BGN" name="Lew" symbol="лв" country="Bulgarien" />
+    <entry code="BHD" name="Dinar" symbol="лв" country="Bahrain" />
+    <entry code="BIF" name="Franc" symbol="лв" country="Burundi" />
+    <entry code="BMD" name="Dollar" symbol="$" country="Bermuda" />
+    <entry code="BND" name="Dollar" symbol="$" country="Brunei" />
+    <entry code="BOB" name="Boliviano" symbol="$b" country="Bolivien" />
+    <entry code="BOV" name="Mvdol" symbol="$b" country="Bolivien" />
+    <entry code="BRL" name="Real" symbol="R$" country="Brasilien" />
+    <entry code="BSD" name="Dollar" symbol="$" country="Bahamas" />
+    <entry code="BTN" name="Ngultrum" symbol="$" country="Bhutan" />
+    <entry code="BWP" name="Pula" symbol="P" country="Botswana" />
+    <entry code="BYN" name="Rubel" symbol="Br" country="Belarus" />
+    <entry code="BZD" name="Dollar" symbol="BZ$" country="Belize" />
+    <entry code="CAD" name="Dollar" symbol="$" country="Kanada" />
+    <entry code="CDF" name="Franc" symbol="$" country="Demokratische Republik Kongo" />
+    <entry code="CHE" name="WIR Euro" symbol="$" country="Schweiz" />
+    <entry code="CHF" name="Franken" symbol="CHF" country="Schweiz, Liechtenstein" />
+    <entry code="CHW" name="WIR Franken" symbol="CHF" country="Schweiz" />
+    <entry code="CLF" name="Unidad de Fomento" symbol="CHF" country="Chile" />
+    <entry code="CLP" name="Peso" symbol="$" country="Chile" />
+    <entry code="CNY" name="Renminbi Yuan" symbol="¥" country="Volksrepublik China" />
+    <entry code="COP" name="Peso" symbol="$" country="Kolumbien" />
+    <entry code="COU" name="Unidad de Valor Real" symbol="$" country="Kolumbien" />
+    <entry code="CRC" name="Colón" symbol="₡" country="Costa Rica" />
+    <entry code="CUC" name="Peso Convertible" symbol="₡" country="Kuba" />
+    <entry code="CUP" name="Peso" symbol="₱" country="Kuba" />
+    <entry code="CVE" name="Escudo" symbol="₱" country="Kap Verde" />
+    <entry code="CZK" name="Krone" symbol="Kč" country="Tschechien" />
+    <entry code="DJF" name="Franc" symbol="Kč" country="Dschibuti" />
+    <entry code="DKK" name="Krone" symbol="kr" country="Dänemark (inkl. Färöer und Grönland)" />
+    <entry code="DOP" name="Peso" symbol="RD$" country="Dominikanische Republik" />
+    <entry code="DZD" name="Dinar" symbol="RD$" country="Algerien" />
+    <entry code="EGP" name="Pfund" symbol="£" country="Ägypten" />
+    <entry code="ERN" name="Nakfa" symbol="£" country="Eritrea" />
+    <entry code="ETB" name="Birr" symbol="£" country="Äthiopien" />
+    <entry code="EUR" name="Euro" symbol="€" country="EU" />
+    <entry code="FJD" name="Dollar" symbol="$" country="Fidschi" />
+    <entry code="FKP" name="Pfund" symbol="£" country="Falklandinseln" />
+    <entry code="GBP" name="Pfund" symbol="£" country="Vereinigtes Königreich" />
+    <entry code="GEL" name="Lari" symbol="£" country="Georgien" />
+    <entry code="GHS" name="Ghana Cedi" symbol="¢" country="Ghana" />
+    <entry code="GIP" name="Pfund" symbol="£" country="Gibraltar" />
+    <entry code="GMD" name="Dalasi" symbol="£" country="Gambia" />
+    <entry code="GNF" name="Guineischer Franc" symbol="£" country="Guinea" />
+    <entry code="GTQ" name="Quetzal" symbol="Q" country="Guatemala" />
+    <entry code="GYD" name="Dollar" symbol="$" country="Guyana" />
+    <entry code="HKD" name="Dollar" symbol="$" country="Hongkong" />
+    <entry code="HNL" name="Lempira" symbol="L" country="Honduras" />
+    <entry code="HRK" name="Kuna" symbol="kn" country="Kroatien" />
+    <entry code="HTG" name="Gourde" symbol="kn" country="Haiti" />
+    <entry code="HUF" name="Forint" symbol="Ft" country="Ungarn" />
+    <entry code="IDR" name="Rupiah" symbol="Rp" country="Indonesien" />
+    <entry code="ILS" name="Schekel" symbol="₪" country="Israel, Staat Palästina" />
+    <entry code="INR" name="Rupie" symbol="INR" country="Indien" />
+    <entry code="IQD" name="Dinar" symbol="IQD" country="Irak" />
+    <entry code="IRR" name="Rial" symbol="﷼" country="Iran" />
+    <entry code="ISK" name="Krone" symbol="kr" country="Island" />
+    <entry code="JMD" name="Dollar" symbol="J$" country="Jamaika" />
+    <entry code="JOD" name="Dinar" symbol="J$" country="Jordanien" />
+    <entry code="JPY" name="Yen" symbol="¥" country="Japan" />
+    <entry code="KES" name="Schilling" symbol="¥" country="Kenia" />
+    <entry code="KGS" name="Som" symbol="лв" country="Kirgisistan" />
+    <entry code="KHR" name="Riel" symbol="៛" country="Kambodscha" />
+    <entry code="KMF" name="Komorischer Franc" symbol="៛" country="Komoren" />
+    <entry code="KPW" name="Won" symbol="₩" country="Nordkorea" />
+    <entry code="KRW" name="Won" symbol="₩" country="Südkorea" />
+    <entry code="KWD" name="Dinar" symbol="₩" country="Kuwait" />
+    <entry code="KYD" name="Dollar" symbol="$" country="Kaimaninseln" />
+    <entry code="KZT" name="Tenge" symbol="лв" country="Kasachstan" />
+    <entry code="LAK" name="Laotischer Kip" symbol="₭" country="Laos" />
+    <entry code="LBP" name="Pfund" symbol="£" country="Libanon" />
+    <entry code="LKR" name="Rupie" symbol="₨" country="Sri Lanka" />
+    <entry code="LRD" name="Dollar" symbol="$" country="Liberia" />
+    <entry code="LSL" name="Loti" symbol="$" country="Lesotho" />
+    <entry code="LYD" name="Dinar" symbol="$" country="Libyen" />
+    <entry code="MAD" name="Dirham" symbol="$" country="Marokko, Westsahara" />
+    <entry code="MDL" name="Leu" symbol="$" country="Moldau" />
+    <entry code="MGA" name="Ariary" symbol="$" country="Madagaskar" />
+    <entry code="MKD" name="Denar" symbol="ден" country="Nordmazedonien" />
+    <entry code="MMK" name="Kyat" symbol="ден" country="Myanmar" />
+    <entry code="MNT" name="Tögrög" symbol="₮" country="Mongolei" />
+    <entry code="MOP" name="Pataca" symbol="₮" country="Macau" />
+    <entry code="MRU" name="Ouguiya" symbol="₮" country="Mauretanien" />
+    <entry code="MUR" name="Rupie" symbol="₨" country="Mauritius" />
+    <entry code="MVR" name="Rufiyaa" symbol="₨" country="Malediven" />
+    <entry code="MWK" name="Kwacha" symbol="₨" country="Malawi" />
+    <entry code="MXN" name="Peso" symbol="$" country="Mexiko" />
+    <entry code="MXV" name="Unidad de Inversión" symbol="$" country="Mexiko" />
+    <entry code="MYR" name="Ringgit" symbol="RM" country="Malaysia" />
+    <entry code="MZN" name="Metical" symbol="MT" country="Mosambik" />
+    <entry code="NAD" name="Dollar" symbol="$" country="Namibia" />
+    <entry code="NGN" name="Naira" symbol="₦" country="Nigeria" />
+    <entry code="NIO" name="Córdoba Oro" symbol="C$" country="Nicaragua" />
+    <entry code="NOK" name="Krone" symbol="kr" country="Norwegen" />
+    <entry code="NPR" name="Rupie" symbol="₨" country="Nepal" />
+    <entry code="NZD" name="Dollar" symbol="$" country="Neuseeland, Niue, Pitcairninseln" />
+    <entry code="OMR" name="Rial" symbol="﷼" country="Oman" />
+    <entry code="PAB" name="Balboa" symbol="B/." country="Panama" />
+    <entry code="PEN" name="Nuevo Sol" symbol="S/." country="Peru" />
+    <entry code="PGK" name="Kina" symbol="S/." country="Papua-Neuguinea" />
+    <entry code="PHP" name="Peso" symbol="₱" country="Philippinen" />
+    <entry code="PKR" name="Rupie" symbol="₨" country="Pakistan" />
+    <entry code="PLN" name="Zloty" symbol="zł" country="Polen" />
+    <entry code="PYG" name="Guaraní" symbol="Gs" country="Paraguay" />
+    <entry code="QAR" name="Riyal" symbol="﷼" country="Katar" />
+    <entry code="RON" name="Leu" symbol="lei" country="Rumänien" />
+    <entry code="RSD" name="Dinar" symbol="Дин." country="Serbien" />
+    <entry code="RUB" name="Rubel" symbol="₽" country="Russland" />
+    <entry code="RWF" name="Franc" symbol="₽" country="Ruanda" />
+    <entry code="SAR" name="Riyal" symbol="﷼" country="Saudi-Arabien" />
+    <entry code="SBD" name="Dollar" symbol="$" country="Salomonen" />
+    <entry code="SCR" name="Rupie" symbol="₨" country="Seychellen" />
+    <entry code="SDG" name="Pfund" symbol="₨" country="Sudan" />
+    <entry code="SEK" name="Krone" symbol="kr" country="Schweden" />
+    <entry code="SGD" name="Dollar" symbol="$" country="Singapur" />
+    <entry code="SHP" name="Pfund" symbol="£" country="St. Helena, Ascension und Tristan da Cunha" />
+    <entry code="SLL" name="Leone" symbol="£" country="Sierra Leone" />
+    <entry code="SOS" name="Schilling" symbol="S" country="Somalia" />
+    <entry code="SRD" name="Dollar" symbol="$" country="Suriname" />
+    <entry code="SSP" name="Pfund" symbol="$" country="Südsudan" />
+    <entry code="STN" name="Neuer Dobra" symbol="$" country="São Tomé und Príncipe" />
+    <entry code="SVC" name="Colón" symbol="$" country="El Salvador" />
+    <entry code="SYP" name="Lira" symbol="£" country="Syrien" />
+    <entry code="SZL" name="Lilangeni" symbol="£" country="Eswatini" />
+    <entry code="THB" name="Baht" symbol="฿" country="Thailand" />
+    <entry code="TJS" name="Somoni" symbol="฿" country="Tadschikistan" />
+    <entry code="TMT" name="Manat" symbol="฿" country="Turkmenistan" />
+    <entry code="TND" name="Dinar" symbol="฿" country="Tunesien" />
+    <entry code="TOP" name="Paʻanga" symbol="฿" country="Tonga" />
+    <entry code="TRY" name="Lira" symbol="TRY" country="Türkei, Nordzypern" />
+    <entry code="TTD" name="Dollar" symbol="TT$" country="Trinidad und Tobago" />
+    <entry code="TWD" name="Dollar" symbol="NT$" country="Republik China (Taiwan)" />
+    <entry code="TZS" name="Schilling" symbol="NT$" country="Tansania" />
+    <entry code="UAH" name="Hrywnja" symbol="₴" country="Ukraine" />
+    <entry code="UGX" name="Schilling" symbol="₴" country="Uganda" />
+    <entry code="USD" name="Dollar" symbol="$" country="USA" />
+    <entry code="UYI" name="Peso en Unidades Indexadas" symbol="$" country="Uruguay" />
+    <entry code="UYU" name="Peso" symbol="$U" country="Uruguay" />
+    <entry code="UZS" name="Soʻm" symbol="лв" country="Usbekistan" />
+    <entry code="VES" name="Bolívar soberano" symbol="Bs" country="Venezuela" />
+    <entry code="VND" name="Đồng" symbol="₫" country="Vietnam" />
+    <entry code="VUV" name="Vatu" symbol="₫" country="Vanuatu" />
+    <entry code="WST" name="Tala" symbol="₫" country="Samoa" />
+    <entry code="XAF" name="Franc CFA (Teilgebiet)" symbol="₫" country="Zentralafrikanische Wirtschafts- und Währungsunion (Äquatorialguinea, Gabun, Kamerun, Republik Kongo, Tschad, Zentralafrikanische Republik)" />
+    <entry code="XCD" name="Dollar" symbol="$" country="Ostkaribische Währungsunion (Antigua und Barbuda, Dominica, Grenada, St. Kitts und Nevis, St. Lucia, St. Vincent und die Grenadinen sowie die britischen Überseegebiete Anguilla und Montserrat)" />
+    <entry code="XOF" name="Franc CFA (Teilgebiet)" symbol="$" country="Westafrikanische Wirtschafts- und Währungsunion (Benin, Burkina Faso, Elfenbeinküste, Guinea-Bissau, Mali, Niger, Senegal, Togo)" />
+    <entry code="XPF" name="Franc CFP" symbol="$" country="Französisch-Polynesien, Neukaledonien, Wallis und Futuna" />
+    <entry code="XSU" name="SUCRE" symbol="$" country="ALBA-Staaten" />
+    <entry code="YER" name="Rial" symbol="﷼" country="Republik Jemen" />
+    <entry code="ZAR" name="Rand" symbol="R" country="Südafrika, Lesotho, Eswatini" />
+    <entry code="ZMW" name="Kwacha" symbol="R" country="Sambia" />
+    <entry code="ZWL" name="Dollar" symbol="Z$" country="Simbabwe" />
+  </currencies>
+</deployment>
