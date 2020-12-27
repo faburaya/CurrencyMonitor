@@ -2,30 +2,39 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using CurrencyMonitor.Data;
-using CurrencyMonitor.DataModels;
 
 namespace CurrencyMonitor.Pages.Subscriptions
 {
     public class CreateModel : PageModel
     {
-        private readonly CurrencyMonitor.Data.CurrencyMonitorContext _context;
+        private readonly Data.CurrencyMonitorContext _context;
 
-        public CreateModel(CurrencyMonitor.Data.CurrencyMonitorContext context)
+        public CreateModel(Data.CurrencyMonitorContext context)
         {
             _context = context;
         }
 
         public IActionResult OnGet()
         {
+            AvailableCurrencies = (
+                from currency in _context.RecognizedCurrency
+                orderby currency.Code
+                select new SelectListItem {
+                    Value = currency.Code,
+                    Text = $"{currency.Code} : {currency.Name}"
+                });
+
             return Page();
         }
 
         [BindProperty]
-        public SubscriptionForExchangeRate SubscriptionForExchangeRate { get; set; }
+        public DataModels.SubscriptionForExchangeRate SubscriptionForExchangeRate { get; set; }
+
+        public IEnumerable<SelectListItem> AvailableCurrencies { get; set; }
 
         // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
         public async Task<IActionResult> OnPostAsync()
