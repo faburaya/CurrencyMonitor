@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using CurrencyMonitor.Data;
 using CurrencyMonitor.DataModels;
 
 namespace CurrencyMonitor.Pages.Currencies
@@ -19,11 +18,30 @@ namespace CurrencyMonitor.Pages.Currencies
             _context = context;
         }
 
-        public IList<RecognizedCurrency> RecognizedCurrency { get;set; }
+        public IList<RecognizedCurrency> RecognizedCurrency { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public string Filter { get; set; }
 
         public async Task OnGetAsync()
         {
-            RecognizedCurrency = await _context.RecognizedCurrency.ToListAsync();
+            if (string.IsNullOrWhiteSpace(Filter))
+            {
+                RecognizedCurrency = await _context.RecognizedCurrency.ToListAsync();
+            }
+            else
+            {
+                var results = (from currency in _context.RecognizedCurrency
+                               where currency.Code.Contains(Filter)
+                                || currency.Name.Contains(Filter)
+                                || currency.Symbol.Contains(Filter)
+                                || currency.Country.Contains(Filter)
+                               orderby currency.Code
+                               select currency);
+
+                RecognizedCurrency = await results.ToListAsync();
+            }
         }
-    }
-}
+
+    } // end of class IndexModel
+} // end of namespace CurrencyMonitor.Pages.Currencies
