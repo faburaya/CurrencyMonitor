@@ -3,14 +3,16 @@ using CurrencyMonitor.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CurrencyMonitor.Migrations
 {
     [DbContext(typeof(CurrencyMonitorContext))]
-    partial class CurrencyMonitorContextModelSnapshot : ModelSnapshot
+    [Migration("20201227230830_NewFieldPrice")]
+    partial class NewFieldPrice
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

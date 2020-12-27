@@ -1,6 +1,6 @@
 ﻿@page
 @model CurrencyMonitor.Pages.Subscriptions.EditModel
-
+@System.Globalization.CultureInfo.CurrentUICulture
 @{
     ViewData["Title"] = "Bearbeiten";
 }
@@ -43,6 +43,11 @@
                     <!-- ASP.NET wird diesen Raum ausfüllen! -->
                 </select>
                 <span asp-validation-for="SubscriptionForExchangeRate.CodeCurrencyToBuy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SubscriptionForExchangeRate.TargetPriceOfSellingCurrency" class="control-label"></label>
+                <input asp-for="SubscriptionForExchangeRate.TargetPriceOfSellingCurrency" class="form-control" />
+                <span asp-validation-for="SubscriptionForExchangeRate.TargetPriceOfSellingCurrency" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Speichern" class="btn btn-primary" />
