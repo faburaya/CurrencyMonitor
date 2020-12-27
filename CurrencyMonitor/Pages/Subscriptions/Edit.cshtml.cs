@@ -6,22 +6,22 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using CurrencyMonitor.Data;
-using CurrencyMonitor.DataModels;
 
 namespace CurrencyMonitor.Pages.Subscriptions
 {
     public class EditModel : PageModel
     {
-        private readonly CurrencyMonitor.Data.CurrencyMonitorContext _context;
+        private readonly Data.CurrencyMonitorContext _context;
 
-        public EditModel(CurrencyMonitor.Data.CurrencyMonitorContext context)
+        public EditModel(Data.CurrencyMonitorContext context)
         {
             _context = context;
         }
 
         [BindProperty]
-        public SubscriptionForExchangeRate SubscriptionForExchangeRate { get; set; }
+        public DataModels.SubscriptionForExchangeRate SubscriptionForExchangeRate { get; set; }
+
+        public IEnumerable<SelectListItem> AvailableCurrencies { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -36,6 +36,15 @@ namespace CurrencyMonitor.Pages.Subscriptions
             {
                 return NotFound();
             }
+
+            AvailableCurrencies = (
+                from currency in _context.RecognizedCurrency
+                orderby currency.Code
+                select new SelectListItem {
+                    Value = currency.Code,
+                    Text = $"{currency.Code} : {currency.Name}"
+                });
+
             return Page();
         }
 
