@@ -1,0 +1,54 @@
+﻿@model CurrencyMonitor.DataModels.SubscriptionForExchangeRate
+
+@{
+    ViewData["Title"] = "Bearbeiten";
+}
+
+<h1>Bearbeiten</h1>
+
+<h4>Sie können hier Ihr Abonnement ändern</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ID" />
+            <div class="form-group">
+                <label asp-for="Label" class="control-label"></label>
+                <input asp-for="Label" class="form-control" />
+                <span asp-validation-for="Label" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EMailAddress" class="control-label"></label>
+                <input asp-for="EMailAddress" class="form-control" />
+                <span asp-validation-for="EMailAddress" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CodeCurrencyToSell" class="control-label"></label>
+                <input asp-for="CodeCurrencyToSell" class="form-control" />
+                <span asp-validation-for="CodeCurrencyToSell" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CodeCurrencyToBuy" class="control-label"></label>
+                <input asp-for="CodeCurrencyToBuy" class="form-control" />
+                <span asp-validation-for="CodeCurrencyToBuy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TargetPriceOfSellingCurrency" class="control-label"></label>
+                <input asp-for="TargetPriceOfSellingCurrency" class="form-control" />
+                <span asp-validation-for="TargetPriceOfSellingCurrency" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Speichern" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Zurück zu allen Abonnements</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

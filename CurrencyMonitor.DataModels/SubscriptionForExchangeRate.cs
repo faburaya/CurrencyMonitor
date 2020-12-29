@@ -13,7 +13,7 @@ namespace CurrencyMonitor.DataModels
 
         [Display(Name = "Bezeichnung")]
         public string Label { get; set; }
-        
+
         [Display(Name = "E-Mail")]
         public string EMailAddress { get; set; }
 

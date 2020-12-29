@@ -1,0 +1,59 @@
+﻿@model IEnumerable<CurrencyMonitor.DataModels.SubscriptionForExchangeRate>
+
+@{
+    ViewData["Title"] = "Abonnements";
+}
+
+<h1>Alle Abonnements</h1>
+
+<p>
+    <a asp-action="Create">Erstellen Sie ein neues Abonnement</a>
+</p>
+<form asp-controller="Currencies" asp-action="Index">
+    <p>
+        E-mail: <input type="text" name="emailFilter" />
+        <input type="submit" value="Filtern" />
+    </p>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Label)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EMailAddress)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CodeCurrencyToSell)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CodeCurrencyToBuy)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Label)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EMailAddress)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CodeCurrencyToSell)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CodeCurrencyToBuy)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.ID">Bearbeiten</a> |
+                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.ID">Löschen</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

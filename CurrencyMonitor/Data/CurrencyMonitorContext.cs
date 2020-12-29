@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using CurrencyMonitor.DataModels;
 
 namespace CurrencyMonitor.Data
 {
@@ -14,8 +12,8 @@ namespace CurrencyMonitor.Data
         {
         }
 
-        public DbSet<CurrencyMonitor.DataModels.SubscriptionForExchangeRate> SubscriptionForExchangeRate { get; set; }
+        public DbSet<DataModels.SubscriptionForExchangeRate> SubscriptionForExchangeRate { get; set; }
 
-        public DbSet<CurrencyMonitor.DataModels.RecognizedCurrency> RecognizedCurrency { get; set; }
+        public DbSet<DataModels.RecognizedCurrency> RecognizedCurrency { get; set; }
     }
 }
