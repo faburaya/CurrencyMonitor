@@ -9,7 +9,7 @@
 <p>
     <a asp-action="Create">Erstellen Sie ein neues Abonnement</a>
 </p>
-<form asp-controller="Subscriptions" asp-action="Index">
+<form asp-controller="Subscriptions" asp-action="Index" method="get">
     <p>
         E-mail: <input type="text" name="emailFilter" />
         <input type="submit" value="Filtern" />
