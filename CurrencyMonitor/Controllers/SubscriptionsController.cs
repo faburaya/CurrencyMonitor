@@ -2,19 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using CurrencyMonitor.Data;
-using CurrencyMonitor.DataModels;
 
 namespace CurrencyMonitor.Controllers
 {
     public class SubscriptionsController : Controller
     {
-        private readonly CurrencyMonitorContext _context;
+        private readonly Data.CurrencyMonitorContext _context;
 
-        public SubscriptionsController(CurrencyMonitorContext context)
+        public SubscriptionsController(Data.CurrencyMonitorContext context)
         {
             _context = context;
         }
@@ -24,18 +22,18 @@ namespace CurrencyMonitor.Controllers
         {
             if (string.IsNullOrWhiteSpace(emailFilter))
             {
-                return View(await
-                    (from subscription
-                     in _context.SubscriptionForExchangeRate
-                     select new Models.SubscriptionViewModel(subscription)).ToListAsync()
-                );
+                return View(await (
+                    from subscription in _context.SubscriptionForExchangeRate
+                    select new Models.SubscriptionViewModel(subscription, _context.RecognizedCurrency.ToList())
+                ).ToListAsync());
             }
             else
             {
-                var searchResults = (from subscription
-                                     in _context.SubscriptionForExchangeRate
-                                     where subscription.EMailAddress.Contains(emailFilter)
-                                     select new Models.SubscriptionViewModel(subscription));
+                var searchResults = (
+                    from subscription in _context.SubscriptionForExchangeRate
+                    where subscription.EMailAddress.Contains(emailFilter)
+                    select new Models.SubscriptionViewModel(subscription, _context.RecognizedCurrency.ToList())
+                );
 
                 return View(await searchResults.ToListAsync());
             }
@@ -49,20 +47,24 @@ namespace CurrencyMonitor.Controllers
                 return NotFound();
             }
 
-            var subscriptionForExchangeRate = await _context.SubscriptionForExchangeRate
+            DataModels.SubscriptionForExchangeRate subscription = await _context.SubscriptionForExchangeRate
                 .FirstOrDefaultAsync(m => m.ID == id);
-            if (subscriptionForExchangeRate == null)
+            if (subscription == null)
             {
                 return NotFound();
             }
 
-            return View(subscriptionForExchangeRate);
+            return View(
+                new Models.SubscriptionViewModel(subscription, _context.RecognizedCurrency.ToList())
+            );
         }
 
         // GET: Subscriptions/Create
         public IActionResult Create()
         {
-            return View();
+            return View(
+                new Models.SubscriptionViewModel(null, _context.RecognizedCurrency.ToList())
+            );
         }
 
         // POST: Subscriptions/Create
@@ -70,7 +72,7 @@ namespace CurrencyMonitor.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Label,EMailAddress,CodeCurrencyToSell,CodeCurrencyToBuy,TargetPriceOfSellingCurrency")] SubscriptionForExchangeRate subscriptionForExchangeRate)
+        public async Task<IActionResult> Create([Bind("ID,Label,EMailAddress,CodeCurrencyToSell,CodeCurrencyToBuy,TargetPriceOfSellingCurrency")] DataModels.SubscriptionForExchangeRate subscriptionForExchangeRate)
         {
             if (ModelState.IsValid)
             {
@@ -89,12 +91,15 @@ namespace CurrencyMonitor.Controllers
                 return NotFound();
             }
 
-            var subscriptionForExchangeRate = await _context.SubscriptionForExchangeRate.FindAsync(id);
-            if (subscriptionForExchangeRate == null)
+            DataModels.SubscriptionForExchangeRate subscription = await _context.SubscriptionForExchangeRate.FindAsync(id);
+            if (subscription == null)
             {
                 return NotFound();
             }
-            return View(subscriptionForExchangeRate);
+
+            return View(
+                new Models.SubscriptionViewModel(subscription, _context.RecognizedCurrency.ToList())
+            );
         }
 
         // POST: Subscriptions/Edit/5
@@ -102,7 +107,7 @@ namespace CurrencyMonitor.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Label,EMailAddress,CodeCurrencyToSell,CodeCurrencyToBuy,TargetPriceOfSellingCurrency")] SubscriptionForExchangeRate subscriptionForExchangeRate)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,Label,EMailAddress,CodeCurrencyToSell,CodeCurrencyToBuy,TargetPriceOfSellingCurrency")] DataModels.SubscriptionForExchangeRate subscriptionForExchangeRate)
         {
             if (id != subscriptionForExchangeRate.ID)
             {
@@ -140,14 +145,16 @@ namespace CurrencyMonitor.Controllers
                 return NotFound();
             }
 
-            var subscriptionForExchangeRate = await _context.SubscriptionForExchangeRate
+            DataModels.SubscriptionForExchangeRate subscription = await _context.SubscriptionForExchangeRate
                 .FirstOrDefaultAsync(m => m.ID == id);
-            if (subscriptionForExchangeRate == null)
+            if (subscription == null)
             {
                 return NotFound();
             }
 
-            return View(subscriptionForExchangeRate);
+            return View(
+                new Models.SubscriptionViewModel(subscription, _context.RecognizedCurrency.ToList())
+            );
         }
 
         // POST: Subscriptions/Delete/5

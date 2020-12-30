@@ -1,4 +1,4 @@
-﻿@model CurrencyMonitor.DataModels.SubscriptionForExchangeRate
+﻿@model CurrencyMonitor.Models.SubscriptionViewModel
 
 @{
     ViewData["Title"] = "Löschen";
@@ -39,7 +39,7 @@
             @Html.DisplayNameFor(model => model.TargetPriceOfSellingCurrency)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TargetPriceOfSellingCurrency)
+            @Html.DisplayFor(model => model.TargetLabel)
         </dd>
     </dl>
     
