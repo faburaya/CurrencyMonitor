@@ -1,4 +1,4 @@
-﻿@model IEnumerable<CurrencyMonitor.DataModels.SubscriptionForExchangeRate>
+﻿@model IEnumerable<CurrencyMonitor.Models.SubscriptionViewModel>
 
 @{
     ViewData["Title"] = "Abonnements";
@@ -9,7 +9,7 @@
 <p>
     <a asp-action="Create">Erstellen Sie ein neues Abonnement</a>
 </p>
-<form asp-controller="Currencies" asp-action="Index">
+<form asp-controller="Subscriptions" asp-action="Index">
     <p>
         E-mail: <input type="text" name="emailFilter" />
         <input type="submit" value="Filtern" />
@@ -25,10 +25,10 @@
                 @Html.DisplayNameFor(model => model.EMailAddress)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CodeCurrencyToSell)
+                @Html.DisplayNameFor(model => model.Exchange)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CodeCurrencyToBuy)
+                @Html.DisplayNameFor(model => model.TargetLabel)
             </th>
             <th></th>
         </tr>
@@ -43,10 +43,10 @@
                 @Html.DisplayFor(modelItem => item.EMailAddress)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.CodeCurrencyToSell)
+                @Html.DisplayFor(modelItem => item.Exchange)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.CodeCurrencyToBuy)
+                @Html.DisplayFor(modelItem => item.TargetLabel)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.ID">Bearbeiten</a> |

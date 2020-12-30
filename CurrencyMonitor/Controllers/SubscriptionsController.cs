@@ -24,14 +24,18 @@ namespace CurrencyMonitor.Controllers
         {
             if (string.IsNullOrWhiteSpace(emailFilter))
             {
-                return View(await _context.SubscriptionForExchangeRate.ToListAsync());
+                return View(await
+                    (from subscription
+                     in _context.SubscriptionForExchangeRate
+                     select new Models.SubscriptionViewModel(subscription)).ToListAsync()
+                );
             }
             else
             {
                 var searchResults = (from subscription
                                      in _context.SubscriptionForExchangeRate
                                      where subscription.EMailAddress.Contains(emailFilter)
-                                     select subscription);
+                                     select new Models.SubscriptionViewModel(subscription));
 
                 return View(await searchResults.ToListAsync());
             }
