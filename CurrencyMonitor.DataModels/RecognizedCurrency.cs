@@ -12,9 +12,12 @@ namespace CurrencyMonitor.DataModels
         /// <summary>
         /// Code nach ISO-4217.
         /// </summary>
+        [Required]
+        [RegularExpression(@"^[A-Z]{3}$")]
         [Display(Name = "ISO-Code")]
         public string Code { get; set; }
 
+        [Required]
         [Display(Name = "Währung")]
         public string Name { get; set; }
 

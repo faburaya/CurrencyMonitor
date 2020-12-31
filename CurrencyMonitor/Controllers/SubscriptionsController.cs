@@ -71,15 +71,17 @@ namespace CurrencyMonitor.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Label,EMailAddress,CodeCurrencyToSell,CodeCurrencyToBuy,TargetPriceOfSellingCurrency")] DataModels.SubscriptionForExchangeRate subscriptionForExchangeRate)
+        public async Task<IActionResult> Create([Bind("ID,Label,EMailAddress,CodeCurrencyToSell,CodeCurrencyToBuy,TargetPriceOfSellingCurrency")] DataModels.SubscriptionForExchangeRate subscription)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(subscriptionForExchangeRate);
+                _context.Add(subscription);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(subscriptionForExchangeRate);
+            return View(
+                new Models.SubscriptionViewModel(subscription, _context.RecognizedCurrency.ToList())
+            );
         }
 
         // GET: Subscriptions/Edit/5
@@ -106,9 +108,9 @@ namespace CurrencyMonitor.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Label,EMailAddress,CodeCurrencyToSell,CodeCurrencyToBuy,TargetPriceOfSellingCurrency")] DataModels.SubscriptionForExchangeRate subscriptionForExchangeRate)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,Label,EMailAddress,CodeCurrencyToSell,CodeCurrencyToBuy,TargetPriceOfSellingCurrency")] DataModels.SubscriptionForExchangeRate subscription)
         {
-            if (id != subscriptionForExchangeRate.ID)
+            if (id != subscription.ID)
             {
                 return NotFound();
             }
@@ -117,12 +119,12 @@ namespace CurrencyMonitor.Controllers
             {
                 try
                 {
-                    _context.Update(subscriptionForExchangeRate);
+                    _context.Update(subscription);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!SubscriptionForExchangeRateExists(subscriptionForExchangeRate.ID))
+                    if (!SubscriptionForExchangeRateExists(subscription.ID))
                     {
                         return NotFound();
                     }
@@ -133,7 +135,10 @@ namespace CurrencyMonitor.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(subscriptionForExchangeRate);
+
+            return View(
+                new Models.SubscriptionViewModel(subscription, _context.RecognizedCurrency.ToList())
+            );
         }
 
         // GET: Subscriptions/Delete/5
