@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CurrencyMonitor.Migrations
 {
     [DbContext(typeof(CurrencyMonitorContext))]
-    [Migration("20201229222702_RecognizedCurrencies")]
-    partial class RecognizedCurrencies
+    [Migration("20210108222756_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -28,12 +28,14 @@ namespace CurrencyMonitor.Migrations
                         .UseIdentityColumn();
 
                     b.Property<string>("Code")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Country")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Symbol")
@@ -52,15 +54,19 @@ namespace CurrencyMonitor.Migrations
                         .UseIdentityColumn();
 
                     b.Property<string>("CodeCurrencyToBuy")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CodeCurrencyToSell")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EMailAddress")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Label")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("TargetPriceOfSellingCurrency")
