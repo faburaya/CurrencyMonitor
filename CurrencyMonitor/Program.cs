@@ -26,7 +26,7 @@ namespace CurrencyMonitor
                 catch (Exception ex)
                 {
                     var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "Während der ersten Ausfüllung der Datenbank ist ein Felher aufgetreten!");
+                    logger.LogError(ex, "Während der ersten Ausfüllung der Datenbank ist ein Fehler aufgetreten!");
                 }
             }
 

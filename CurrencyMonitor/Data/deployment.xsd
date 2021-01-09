@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.currencymonitor.com/deployment" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="deployment">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="1" name="currencies">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="entry">
+                <xs:complexType>
+                  <xs:attribute name="code" type="xs:string" use="required" />
+                  <xs:attribute name="name" type="xs:string" use="required" />
+                  <xs:attribute name="symbol" type="xs:string" use="required" />
+                  <xs:attribute name="country" type="xs:string" use="required" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

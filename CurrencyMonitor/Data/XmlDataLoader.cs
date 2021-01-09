@@ -14,34 +14,61 @@ namespace CurrencyMonitor.Data
     {
         public enum File { InitialData }
 
-        private static XmlDocument ParseXmlFile(File file)
+        /// <summary>
+        /// Bescreibt weitere Informationen über eine XML-Datei.
+        /// </summary>
+        private class FileMetadata
         {
-            var dom = new XmlDocument();
+            public string XmlFilePath { get; }
 
+            public string SchemaFilePath { get; }
+
+            public string XmlNamespace { get; }
+
+            public FileMetadata(string directory,
+                                string xmlFileName,
+                                string schemaFileName,
+                                string xmlNamespace)
+            {
+                this.XmlFilePath = System.IO.Path.Combine(directory, xmlFileName);
+                this.SchemaFilePath = System.IO.Path.Combine(directory, schemaFileName);
+                this.XmlNamespace = xmlNamespace;
+            }
+        }
+
+        private static FileMetadata GetMetadata(File file)
+        {
             switch (file)
             {
                 case File.InitialData:
-                    dom.Load(System.IO.Path.Combine("Data", "InitializationData.xml"));
-                    break;
-
+                    return new FileMetadata("Data",
+                                            "deployment.xml",
+                                            "deployment.xsd",
+                                            "http://www.currencymonitor.com/deployment");
                 default:
-                    throw new NotSupportedException($"XML-Datei {file} ist nicht zum Laden unterstützt!");
+                    throw new NotSupportedException($"XML-Datei {file} ist noch nicht unterstützt!");
             }
+        }
 
+        private static XmlDocument ParseXmlFile(FileMetadata metadata)
+        {
+            var dom = new XmlDocument();
+            dom.Load(metadata.XmlFilePath);
+            dom.Schemas.Add(metadata.XmlNamespace, metadata.SchemaFilePath);
+            dom.Validate(null);
             return dom;
         }
 
-
+        private FileMetadata _metadata;
         private XmlDocument _dom;
-        private Func<XmlDocument> _delayedParseXml;
         private XmlDocument XmlDataSource
         {
-            get { return _dom ??= _delayedParseXml(); }
+            get { return _dom ??= ParseXmlFile(_metadata); }
         }
 
         public XmlDataLoader(File file)
         {
-            _delayedParseXml = (() => ParseXmlFile(file));
+            _metadata = GetMetadata(file);
         }
 
         public enum DataSet { Currencies }
@@ -74,8 +101,11 @@ namespace CurrencyMonitor.Data
             if (intoDataSet.Any())
                 return;
 
-            const string xpath = "/deployment/currencies/entry";
-            foreach (XmlNode node in XmlDataSource.SelectNodes(xpath))
+            XmlNamespaceManager nsManager = new XmlNamespaceManager(XmlDataSource.NameTable);
+            nsManager.AddNamespace("tns", _metadata.XmlNamespace);
+
+            const string xpath = "/tns:deployment/tns:currencies/tns:entry";
+            foreach (XmlNode node in XmlDataSource.SelectNodes(xpath, nsManager))
             {
                 var entry = node as XmlElement;
 
