@@ -5,15 +5,23 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Data\secrets.xml" />
+    <None Remove="Data\secrets.xsd" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="Data\deployment.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\deployment.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Resource Include="Data\deployment.xsd">
+    <Content Include="Data\secrets.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
+    </Content>
+    <Content Include="Data\secrets.xsd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

@@ -21,13 +21,20 @@ namespace CurrencyMonitor
 
         public IConfiguration Configuration { get; }
 
+        private string GetSecretConnectionString(string connectionName)
+        {
+            var secretLoader = new SecretLoader();
+            string secretPrefix = secretLoader.GetDatabaseConnString(connectionName);
+            return Configuration.GetConnectionString(connectionName).Replace("verborgen???", secretPrefix);
+        }
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
 
             services.AddDbContext<CurrencyMonitorContext>(options =>
-                    options.UseSqlServer(Configuration.GetConnectionString("CurrencyMonitorContext")));
+                    options.UseSqlServer(GetSecretConnectionString("CurrencyMonitorContext")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
