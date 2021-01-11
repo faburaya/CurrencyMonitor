@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <None Remove="Data\secrets.xml" />
-    <None Remove="Data\secrets.xsd" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,15 +18,11 @@
     <Content Include="Data\secrets.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Data\secrets.xsd">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="jquery-globalize" Version="1.4.2" />
     <PackageReference Include="jQuery.Validation.Globalize" Version="1.1.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.1">
       <PrivateAssets>all</PrivateAssets>
@@ -38,6 +33,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CurrencyMonitor.DataModels\CurrencyMonitor.DataModels.csproj" />
+    <ProjectReference Include="..\CurrencyMonitor.Data\CurrencyMonitor.Data.csproj" />
   </ItemGroup>
 
 </Project>

@@ -10,26 +10,48 @@ namespace CurrencyMonitor.Data
     /// </summary>
     public class SecretLoader
     {
-        private static string XmlNamespace => "http://www.currencymonitor.com/secrets";
+        /// <summary>
+        /// Metadaten über die zu ladende XML-Datei.
+        /// </summary>
+        public class XmlMetadata
+        {
+            /// <summary>
+            /// Namespace, wo in der XML-Datei die Namen deklariert werden.
+            /// </summary>
+            public string XmlNamespace { get; }
 
-        private static string XmlFilePath => System.IO.Path.Combine("Data", "secrets.xml");
+            /// <summary>
+            /// Pfad der XML-Datei.
+            /// </summary>
+            public string FilePath { get; }
 
-        private static string SchemaFilePath => System.IO.Path.Combine("Data", "secrets.xsd");
+            /// <summary>
+            ///  Pfad der XSD-Datei.
+            /// </summary>
+            public string SchemaFilePath { get; }
+
+            public XmlMetadata(string xmlns, string filePath, string schemaFilePath)
+            {
+                this.XmlNamespace = xmlns;
+                this.FilePath = filePath;
+                this.SchemaFilePath = schemaFilePath;
+            }
+        }
 
         /// <summary>
         /// Lädt die Datenquelle mit den Geheimnissen.
         /// </summary>
-        public SecretLoader()
+        public SecretLoader(XmlMetadata metadata)
         {
             var dom = new XmlDocument();
-            dom.Load(XmlFilePath);
-            dom.Schemas.Add(XmlNamespace, SchemaFilePath);
+            dom.Load(metadata.FilePath);
+            dom.Schemas.Add(metadata.XmlNamespace, metadata.SchemaFilePath);
             dom.Validate(null);
 
-            _dbConnStringsByName = LoadDatabaseConnectionStrings(dom);
+            _dbConnStringsByName = LoadDatabaseConnectionStrings(dom, metadata.XmlNamespace);
         }
 
-        private Dictionary<string, string> _dbConnStringsByName;
+        private readonly Dictionary<string, string> _dbConnStringsByName;
 
         /// <summary>
         /// Bietet eine Verbindugszeichenkette für Datenbank.
@@ -41,12 +63,13 @@ namespace CurrencyMonitor.Data
             return _dbConnStringsByName.TryGetValue(name, out string connectionString) ? connectionString : "[Verbindungszeichenkette der Datenbank nicht gefunden!];";
         }
 
-        private static Dictionary<string, string> LoadDatabaseConnectionStrings(XmlDocument dom)
+        private static Dictionary<string, string> LoadDatabaseConnectionStrings(XmlDocument dom,
+                                                                                string targetNamespace)
         {
             var dbConnStringsByName = new Dictionary<string, string>();
 
             XmlNamespaceManager nsManager = new XmlNamespaceManager(dom.NameTable);
-            nsManager.AddNamespace("tns", XmlNamespace);
+            nsManager.AddNamespace("tns", targetNamespace);
 
             const string xpath = "/tns:secrets/tns:database/tns:connection";
             foreach (XmlNode node in dom.SelectNodes(xpath, nsManager))

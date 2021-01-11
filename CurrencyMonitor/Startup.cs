@@ -14,7 +14,7 @@ namespace CurrencyMonitor
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Configuration = configuration;
         }
@@ -23,7 +23,12 @@ namespace CurrencyMonitor
 
         private string GetSecretConnectionString(string connectionName)
         {
-            var secretLoader = new SecretLoader();
+            var secretLoader = new SecretLoader(
+                new SecretLoader.XmlMetadata(
+                    "http://www.currencymonitor.com/secrets",
+                    System.IO.Path.Combine("Data", "secrets.xml"),
+                    System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "secrets.xsd"))
+            );
             string secretPrefix = secretLoader.GetDatabaseConnString(connectionName);
             return Configuration.GetConnectionString(connectionName).Replace("verborgen???", secretPrefix);
         }
