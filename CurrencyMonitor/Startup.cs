@@ -8,8 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 
-using CurrencyMonitor.Data;
-
 namespace CurrencyMonitor
 {
     public class Startup
@@ -23,8 +21,8 @@ namespace CurrencyMonitor
 
         private string GetSecretConnectionString(string connectionName)
         {
-            var secretLoader = new SecretLoader(
-                new SecretLoader.XmlMetadata(
+            var secretLoader = new Data.SecretLoader(
+                new Data.XmlMetadata(
                     "http://www.currencymonitor.com/secrets",
                     System.IO.Path.Combine("Data", "secrets.xml"),
                     System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "secrets.xsd"))
@@ -38,7 +36,7 @@ namespace CurrencyMonitor
         {
             services.AddControllersWithViews();
 
-            services.AddDbContext<CurrencyMonitorContext>(options =>
+            services.AddDbContext<Data.CurrencyMonitorContext>(options =>
                     options.UseSqlServer(GetSecretConnectionString("CurrencyMonitorContext")));
         }
 
@@ -69,5 +67,7 @@ namespace CurrencyMonitor
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
         }
-    }
-}
+
+    }// end of class Startup
+
+}// end of namespace CurrencyMonitor

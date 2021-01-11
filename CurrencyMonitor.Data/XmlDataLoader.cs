@@ -12,63 +12,25 @@ namespace CurrencyMonitor.Data
     /// </summary>
     public class XmlDataLoader
     {
-        public enum File { InitialData }
-
-        /// <summary>
-        /// Bescreibt weitere Informationen über eine XML-Datei.
-        /// </summary>
-        private class FileMetadata
-        {
-            public string XmlFilePath { get; }
-
-            public string SchemaFilePath { get; }
-
-            public string XmlNamespace { get; }
-
-            public FileMetadata(string directory,
-                                string xmlFileName,
-                                string schemaFileName,
-                                string xmlNamespace)
-            {
-                this.XmlFilePath = System.IO.Path.Combine(directory, xmlFileName);
-                this.SchemaFilePath = System.IO.Path.Combine(directory, schemaFileName);
-                this.XmlNamespace = xmlNamespace;
-            }
-        }
-
-        private static FileMetadata GetMetadata(File file)
-        {
-            switch (file)
-            {
-                case File.InitialData:
-                    return new FileMetadata("Data",
-                                            "deployment.xml",
-                                            "deployment.xsd",
-                                            "http://www.currencymonitor.com/deployment");
-                default:
-                    throw new NotSupportedException($"XML-Datei {file} ist noch nicht unterstützt!");
-            }
-        }
-
-        private static XmlDocument ParseXmlFile(FileMetadata metadata)
+        private static XmlDocument ParseXmlFile(XmlMetadata metadata)
         {
             var dom = new XmlDocument();
-            dom.Load(metadata.XmlFilePath);
+            dom.Load(metadata.FilePath);
             dom.Schemas.Add(metadata.XmlNamespace, metadata.SchemaFilePath);
             dom.Validate(null);
             return dom;
         }
 
-        private FileMetadata _metadata;
+        private XmlMetadata _metadata;
         private XmlDocument _dom;
         private XmlDocument XmlDataSource
         {
             get { return _dom ??= ParseXmlFile(_metadata); }
         }
 
-        public XmlDataLoader(File file)
+        public XmlDataLoader(XmlMetadata metadata)
         {
-            _metadata = GetMetadata(file);
+            _metadata = metadata;
         }
 
         public enum DataSet { Currencies }
