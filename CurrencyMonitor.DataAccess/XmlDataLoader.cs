@@ -43,28 +43,32 @@ namespace CurrencyMonitor.DataAccess
         /// <param name="dbAccess">Gewährt Zugang auf Datenbank.</param>
         public void Load(DataSet dataSet, IDatabaseAccess dbAccess)
         {
+            bool isEmptyBatch = true;
+
             switch (dataSet)
             {
                 case DataSet.Currencies:
-                    LoadCurrencies(dbAccess);
+                    isEmptyBatch = (LoadCurrencies(dbAccess) == 0);
                     break;
 
                 default:
                     throw new NotSupportedException($"DataSet {dataSet} ist nicht zum Laden unterstützt!");
             }
-
-            dbAccess.Commit();
+            
+            if (!isEmptyBatch)
+                dbAccess.Commit();
         }
 
-        private void LoadCurrencies(IDatabaseAccess dbAccess)
+        private int LoadCurrencies(IDatabaseAccess dbAccess)
         {
             if (dbAccess.HasAny<DataModels.RecognizedCurrency>())
-                return;
+                return 0;
 
             XmlNamespaceManager nsManager = new XmlNamespaceManager(XmlDataSource.NameTable);
             nsManager.AddNamespace("tns", _metadata.XmlNamespace);
-
             const string xpath = "/tns:deployment/tns:currencies/tns:entry";
+
+            int loadCount = 0;
             foreach (XmlNode node in XmlDataSource.SelectNodes(xpath, nsManager))
             {
                 var entry = node as XmlElement;
@@ -78,7 +82,10 @@ namespace CurrencyMonitor.DataAccess
                 };
 
                 dbAccess.Insert(deserializedObject);
+                ++loadCount;
             }
+
+            return loadCount;
         }
 
     } // end of class XmlDataLoader

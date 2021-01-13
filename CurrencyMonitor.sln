@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CurrencyMonitor.DataModels"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CurrencyMonitor.DataAccess", "CurrencyMonitor.DataAccess\CurrencyMonitor.DataAccess.csproj", "{FE0B4B37-73AD-44D0-8EDA-2F97AA251595}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurrencyMonitor.DataAccess.UnitTests", "CurrencyMonitor.DataAccess.UnitTests\CurrencyMonitor.DataAccess.UnitTests.csproj", "{3E7A287B-8AE6-404B-8F6F-436937B85FE5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{FE0B4B37-73AD-44D0-8EDA-2F97AA251595}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FE0B4B37-73AD-44D0-8EDA-2F97AA251595}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FE0B4B37-73AD-44D0-8EDA-2F97AA251595}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E7A287B-8AE6-404B-8F6F-436937B85FE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E7A287B-8AE6-404B-8F6F-436937B85FE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E7A287B-8AE6-404B-8F6F-436937B85FE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E7A287B-8AE6-404B-8F6F-436937B85FE5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
