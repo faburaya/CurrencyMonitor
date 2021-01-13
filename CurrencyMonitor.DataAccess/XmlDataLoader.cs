@@ -2,9 +2,6 @@
 using System.Xml;
 using System.Linq;
 
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-
 namespace CurrencyMonitor.DataAccess
 {
     /// <summary>
@@ -43,29 +40,25 @@ namespace CurrencyMonitor.DataAccess
         /// Lädt die Daten aus der XML-Datei und speichert sie durch EF.
         /// </summary>
         /// <param name="dataSet">Welche Daten geladen werden müssen.</param>
-        /// <param name="serviceProvider">Unter anderen, gibt die Datenkontextklasse,
-        /// wo die Daten gespeichert werden.</param>
-        public void Load(DataSet dataSet, IServiceProvider serviceProvider)
+        /// <param name="dbAccess">Gewährt Zugang auf Datenbank.</param>
+        public void Load(DataSet dataSet, IDatabaseAccess dbAccess)
         {
-            using CurrencyMonitorContext dbContext = new CurrencyMonitorContext(
-                serviceProvider.GetRequiredService<DbContextOptions<CurrencyMonitorContext>>());
-
             switch (dataSet)
             {
                 case DataSet.Currencies:
-                    LoadCurrencies(dbContext.RecognizedCurrency);
+                    LoadCurrencies(dbAccess);
                     break;
 
                 default:
                     throw new NotSupportedException($"DataSet {dataSet} ist nicht zum Laden unterstützt!");
             }
 
-            dbContext.SaveChanges();
+            dbAccess.Commit();
         }
 
-        private void LoadCurrencies(DbSet<DataModels.RecognizedCurrency> intoDataSet)
+        private void LoadCurrencies(IDatabaseAccess dbAccess)
         {
-            if (intoDataSet.Any())
+            if (dbAccess.HasAny<DataModels.RecognizedCurrency>())
                 return;
 
             XmlNamespaceManager nsManager = new XmlNamespaceManager(XmlDataSource.NameTable);
@@ -84,7 +77,7 @@ namespace CurrencyMonitor.DataAccess
                     Country = entry.GetAttribute("country")
                 };
 
-                intoDataSet.Add(deserializedObject);
+                dbAccess.Insert(deserializedObject);
             }
         }
 

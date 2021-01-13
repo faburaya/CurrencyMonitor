@@ -1,6 +1,7 @@
 using System;
 
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -20,13 +21,17 @@ namespace CurrencyMonitor
 
                 try
                 {
+                    using var dbContext = new DataAccess.CurrencyMonitorContext(
+                        serviceProvider.GetRequiredService<DbContextOptions<DataAccess.CurrencyMonitorContext>>());
+
                     var xmlDataLoader = new DataAccess.XmlDataLoader(
                         new DataAccess.XmlMetadata(
                             "http://www.currencymonitor.com/deployment",
                             System.IO.Path.Combine("Data", "deployment.xml"),
                             System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "deployment.xsd"))
                     );
-                    xmlDataLoader.Load(DataAccess.XmlDataLoader.DataSet.Currencies, serviceProvider);
+                    xmlDataLoader.Load(DataAccess.XmlDataLoader.DataSet.Currencies,
+                                       new DataAccess.DbAccessViaEF(dbContext));
                 }
                 catch (Exception ex)
                 {
