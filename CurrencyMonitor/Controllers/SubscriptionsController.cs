@@ -9,9 +9,9 @@ namespace CurrencyMonitor.Controllers
 {
     public class SubscriptionsController : Controller
     {
-        private readonly Data.CurrencyMonitorContext _context;
+        private readonly DataAccess.CurrencyMonitorContext _context;
 
-        public SubscriptionsController(Data.CurrencyMonitorContext context)
+        public SubscriptionsController(DataAccess.CurrencyMonitorContext context)
         {
             _context = context;
         }

@@ -29,8 +29,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CurrencyMonitor.DataAccess\CurrencyMonitor.DataAccess.csproj" />
     <ProjectReference Include="..\CurrencyMonitor.DataModels\CurrencyMonitor.DataModels.csproj" />
-    <ProjectReference Include="..\CurrencyMonitor.Data\CurrencyMonitor.Data.csproj" />
   </ItemGroup>
 
 </Project>

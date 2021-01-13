@@ -1,7 +1,7 @@
 ﻿using System.Xml;
 using System.Collections.Generic;
 
-namespace CurrencyMonitor.Data
+namespace CurrencyMonitor.DataAccess
 {
     /// <summary>
     /// Lädt geheime Daten, die außerhalb der appsettings.json bleiben sollen.
@@ -58,4 +58,4 @@ namespace CurrencyMonitor.Data
 
     }// end of class SecretLoader
 
-}// end of namespace CurrencyMonitor.Data
+}// end of namespace CurrencyMonitor.DataAccess

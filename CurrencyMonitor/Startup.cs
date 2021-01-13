@@ -21,8 +21,8 @@ namespace CurrencyMonitor
 
         private string GetSecretConnectionString(string connectionName)
         {
-            var secretLoader = new Data.SecretLoader(
-                new Data.XmlMetadata(
+            var secretLoader = new DataAccess.SecretLoader(
+                new DataAccess.XmlMetadata(
                     "http://www.currencymonitor.com/secrets",
                     System.IO.Path.Combine("Data", "secrets.xml"),
                     System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "secrets.xsd"))
@@ -36,7 +36,7 @@ namespace CurrencyMonitor
         {
             services.AddControllersWithViews();
 
-            services.AddDbContext<Data.CurrencyMonitorContext>(options =>
+            services.AddDbContext<DataAccess.CurrencyMonitorContext>(options =>
                     options.UseSqlServer(GetSecretConnectionString("CurrencyMonitorContext")));
         }
 

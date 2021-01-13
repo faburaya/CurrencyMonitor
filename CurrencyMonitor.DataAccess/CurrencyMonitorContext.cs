@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace CurrencyMonitor.Data
+namespace CurrencyMonitor.DataAccess
 {
     public class CurrencyMonitorContext : DbContext
     {

@@ -5,7 +5,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CurrencyMonitor.Data
+namespace CurrencyMonitor.DataAccess
 {
     /// <summary>
     /// Lädt Daten aus einer XML datei und speichert sie.
@@ -28,6 +28,10 @@ namespace CurrencyMonitor.Data
             get { return _dom ??= ParseXmlFile(_metadata); }
         }
 
+        /// <summary>
+        /// Stellt eine Instanz von <see cref="XmlDataLoader"/> her.
+        /// </summary>
+        /// <param name="metadata">Die Metadaten über das XML, das geladen werden muss.</param>
         public XmlDataLoader(XmlMetadata metadata)
         {
             _metadata = metadata;
@@ -39,7 +43,8 @@ namespace CurrencyMonitor.Data
         /// Lädt die Daten aus der XML-Datei und speichert sie durch EF.
         /// </summary>
         /// <param name="dataSet">Welche Daten geladen werden müssen.</param>
-        /// <param name="dbContext">Die Datenkontextklasse, wo die Daten gespeichert werden.</param>
+        /// <param name="serviceProvider">Unter anderen, gibt die Datenkontextklasse,
+        /// wo die Daten gespeichert werden.</param>
         public void Load(DataSet dataSet, IServiceProvider serviceProvider)
         {
             using CurrencyMonitorContext dbContext = new CurrencyMonitorContext(
@@ -84,4 +89,4 @@ namespace CurrencyMonitor.Data
         }
 
     } // end of class XmlDataLoader
-}// end of namespace CurrencyMonitor.Data
+}// end of namespace CurrencyMonitor.DataAccess

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CurrencyMonitor.Data
+namespace CurrencyMonitor.DataAccess
 {
     /// <summary>
     /// Metadaten über die zu ladende XML-Datei.

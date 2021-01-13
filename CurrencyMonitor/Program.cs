@@ -20,13 +20,13 @@ namespace CurrencyMonitor
 
                 try
                 {
-                    var xmlDataLoader = new Data.XmlDataLoader(
-                        new Data.XmlMetadata(
+                    var xmlDataLoader = new DataAccess.XmlDataLoader(
+                        new DataAccess.XmlMetadata(
                             "http://www.currencymonitor.com/deployment",
                             System.IO.Path.Combine("Data", "deployment.xml"),
                             System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "deployment.xsd"))
                     );
-                    xmlDataLoader.Load(Data.XmlDataLoader.DataSet.Currencies, serviceProvider);
+                    xmlDataLoader.Load(DataAccess.XmlDataLoader.DataSet.Currencies, serviceProvider);
                 }
                 catch (Exception ex)
                 {
