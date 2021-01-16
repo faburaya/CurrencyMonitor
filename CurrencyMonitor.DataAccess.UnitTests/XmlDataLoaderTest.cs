@@ -37,6 +37,8 @@ namespace CurrencyMonitor.DataAccess.UnitTests
             mockDbAccess.Setup(obj => obj.IsEmpty()).Returns(true);
             Assert.Throws(exceptionType, () => dataLoader.Load(mockDbAccess.Object));
             mockDbAccess.Verify();
+
+            File.Delete(TestFilePath);
         }
 
         [Fact]
@@ -52,6 +54,8 @@ namespace CurrencyMonitor.DataAccess.UnitTests
             mockDbAccess.Setup(obj => obj.Commit());
             dataLoader.Load(mockDbAccess.Object);
             mockDbAccess.Verify();
+
+            File.Delete(TestFilePath);
         }
 
         [Theory]
@@ -85,6 +89,8 @@ namespace CurrencyMonitor.DataAccess.UnitTests
 
                 mockDbAccess.Verify(dac => dac.Commit(), Times.Once);
             }
+
+            File.Delete(TestFilePath);
         }
 
         [Fact]
@@ -127,6 +133,8 @@ namespace CurrencyMonitor.DataAccess.UnitTests
             , Times.Once);
 
             mockDbAccess.Verify(dac => dac.Commit(), Times.Once);
+
+            File.Delete(TestFilePath);
         }
 
     }// end of class XmlDataLoaderTest
