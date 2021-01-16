@@ -2,7 +2,7 @@
 using System.Xml;
 using System.Collections.Generic;
 
-namespace CurrencyMonitor.Data
+namespace CurrencyMonitor.DataAccess
 {
     /// <summary>
     /// Lädt geheime Daten, die außerhalb der appsettings.json bleiben sollen.
@@ -10,43 +10,43 @@ namespace CurrencyMonitor.Data
     /// </summary>
     public class SecretLoader
     {
-        private static string XmlNamespace => "http://www.currencymonitor.com/secrets";
-
-        private static string XmlFilePath => System.IO.Path.Combine("Data", "secrets.xml");
-
-        private static string SchemaFilePath => System.IO.Path.Combine("Data", "secrets.xsd");
-
         /// <summary>
         /// Lädt die Datenquelle mit den Geheimnissen.
         /// </summary>
-        public SecretLoader()
+        public SecretLoader(XmlMetadata metadata)
         {
             var dom = new XmlDocument();
-            dom.Load(XmlFilePath);
-            dom.Schemas.Add(XmlNamespace, SchemaFilePath);
+            dom.Load(metadata.FilePath);
+            dom.Schemas.Add(metadata.XmlNamespace, metadata.SchemaFilePath);
             dom.Validate(null);
 
-            _dbConnStringsByName = LoadDatabaseConnectionStrings(dom);
+            _dbConnStringsByName = LoadDatabaseConnectionStrings(dom, metadata.XmlNamespace);
         }
 
-        private Dictionary<string, string> _dbConnStringsByName;
+        private readonly Dictionary<string, string> _dbConnStringsByName;
 
         /// <summary>
         /// Bietet eine Verbindugszeichenkette für Datenbank.
         /// </summary>
-        /// <param name="name">Der Name der Verbindung.</param>
+        /// <param name="name">Der Name der gewünschten Verbindung.</param>
         /// <returns>Der geheime Teil der Verbindungszeichenkette: "Server;Database;User ID;Password;"</returns>
         public string GetDatabaseConnString(string name)
         {
-            return _dbConnStringsByName.TryGetValue(name, out string connectionString) ? connectionString : "[Verbindungszeichenkette der Datenbank nicht gefunden!];";
+            if (!_dbConnStringsByName.TryGetValue(name, out string connectionString))
+            {
+                throw new ApplicationException($"Die Verbindungszeichenkette '{name}' für die Datenbank konnte nicht aus der Geheimnissen herausgeholt werden!");
+            }
+
+            return connectionString;
         }
 
-        private static Dictionary<string, string> LoadDatabaseConnectionStrings(XmlDocument dom)
+        private static Dictionary<string, string> LoadDatabaseConnectionStrings(XmlDocument dom,
+                                                                                string targetNamespace)
         {
             var dbConnStringsByName = new Dictionary<string, string>();
 
             XmlNamespaceManager nsManager = new XmlNamespaceManager(dom.NameTable);
-            nsManager.AddNamespace("tns", XmlNamespace);
+            nsManager.AddNamespace("tns", targetNamespace);
 
             const string xpath = "/tns:secrets/tns:database/tns:connection";
             foreach (XmlNode node in dom.SelectNodes(xpath, nsManager))
@@ -64,4 +64,4 @@ namespace CurrencyMonitor.Data
 
     }// end of class SecretLoader
 
-}// end of namespace CurrencyMonitor.Data
+}// end of namespace CurrencyMonitor.DataAccess

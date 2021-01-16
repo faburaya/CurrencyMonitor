@@ -6,8 +6,6 @@
 <h1 class="text-danger">Fehler.</h1>
 <h2 class="text-danger">Ein Felher ist während der Bearbeitung Ihrer Anfrage aufgetreten.</h2>
 
-@*Es muss darunter übersetzt werden...*@
-
 @if (Model.ShowRequestId)
 {
     <p>
@@ -15,13 +13,13 @@
     </p>
 }
 
-<h3>Development Mode</h3>
+<h3>Entwicklungsmodus</h3>
 <p>
-    Swapping to the <strong>Development</strong> environment displays detailed information about the error that occurred.
+    Anschalten der <strong>Entwicklungsumgebung</strong> zeigt detailierte Informationen über den auftretenden Fehler.
 </p>
 <p>
-    <strong>The Development environment shouldn't be enabled for deployed applications.</strong>
-    It can result in displaying sensitive information from exceptions to end users.
-    For local debugging, enable the <strong>Development</strong> environment by setting the <strong>ASPNETCORE_ENVIRONMENT</strong> environment variable to <strong>Development</strong>
-    and restarting the app.
+    <strong>Die Entwicklungsumgebung soll bei dem Ansatz der Anwendung NICHT angeschaltet werden.</strong>
+    Es kann den Benutzern geheime Informationen von Exceptions verraten.
+    Für lokales Debuggen, schalten Sie die <strong>Entwicklungsumgebung</strong> an, indem man die Umgebungsvariable
+    <strong>ASPNETCORE_ENVIRONMENT</strong> als <strong>Development</strong> festlegt und dann die Anwendung neu startet.
 </p>

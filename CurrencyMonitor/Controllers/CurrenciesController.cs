@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using CurrencyMonitor.Data;
+using CurrencyMonitor.DataAccess;
 using CurrencyMonitor.DataModels;
 
 namespace CurrencyMonitor.Controllers

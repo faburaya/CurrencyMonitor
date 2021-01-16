@@ -6,7 +6,7 @@
         <xs:element maxOccurs="1" name="currencies">
           <xs:complexType>
             <xs:sequence>
-              <xs:element maxOccurs="unbounded" name="entry">
+              <xs:element minOccurs="0" maxOccurs="unbounded" name="entry">
                 <xs:complexType>
                   <xs:attribute name="code" type="xs:string" use="required" />
                   <xs:attribute name="name" type="xs:string" use="required" />

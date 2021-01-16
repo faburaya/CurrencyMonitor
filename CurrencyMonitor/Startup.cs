@@ -8,13 +8,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 
-using CurrencyMonitor.Data;
-
 namespace CurrencyMonitor
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Configuration = configuration;
         }
@@ -23,7 +21,12 @@ namespace CurrencyMonitor
 
         private string GetSecretConnectionString(string connectionName)
         {
-            var secretLoader = new SecretLoader();
+            var secretLoader = new DataAccess.SecretLoader(
+                new DataAccess.XmlMetadata(
+                    "http://www.currencymonitor.com/secrets",
+                    System.IO.Path.Combine("Data", "secrets.xml"),
+                    System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "secrets.xsd"))
+            );
             string secretPrefix = secretLoader.GetDatabaseConnString(connectionName);
             return Configuration.GetConnectionString(connectionName).Replace("verborgen???", secretPrefix);
         }
@@ -33,7 +36,7 @@ namespace CurrencyMonitor
         {
             services.AddControllersWithViews();
 
-            services.AddDbContext<CurrencyMonitorContext>(options =>
+            services.AddDbContext<DataAccess.CurrencyMonitorContext>(options =>
                     options.UseSqlServer(GetSecretConnectionString("CurrencyMonitorContext")));
         }
 
@@ -64,5 +67,7 @@ namespace CurrencyMonitor
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
         }
-    }
-}
+
+    }// end of class Startup
+
+}// end of namespace CurrencyMonitor
