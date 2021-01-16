@@ -87,6 +87,48 @@ namespace CurrencyMonitor.DataAccess.UnitTests
             }
         }
 
+        [Fact]
+        public void Load_Currencies_WhenManyAvailable_ThenLoadAll()
+        {
+            File.WriteAllText(TestFilePath,
+                CreateValidXml(new string[] {
+                    @"<entry code=""EUR"" name=""Euro"" symbol=""€"" country=""EU"" />",
+                    @"<entry code=""USD"" name=""Dollar"" symbol=""$"" country=""USA"" />",
+                    @"<entry code=""BRL"" name=""Real"" symbol=""R$"" country=""Brasilien"" />"
+                })
+            );
+
+            var dataLoader = new XmlDataLoader(
+                new XmlMetadata(DeploymentXmlNamespace, TestFilePath, SchemaDeploymentFilePath));
+
+            var mockDbAccess = new Mock<ITableAccess<DataModels.RecognizedCurrency>>(MockBehavior.Strict);
+            mockDbAccess.Setup(obj => obj.IsEmpty()).Returns(true);
+            mockDbAccess.Setup(obj => obj.Insert(It.IsAny<DataModels.RecognizedCurrency>()));
+            mockDbAccess.Setup(obj => obj.Commit());
+
+            dataLoader.Load(mockDbAccess.Object);
+
+            mockDbAccess.Verify(
+                dac => dac.Insert(
+                    It.Is<DataModels.RecognizedCurrency>(obj =>
+                        obj.Code == "EUR" && obj.Name == "Euro" && obj.Symbol == "€" && obj.Country == "EU"))
+            , Times.Once);
+
+            mockDbAccess.Verify(
+                dac => dac.Insert(
+                    It.Is<DataModels.RecognizedCurrency>(obj =>
+                        obj.Code == "USD" && obj.Name == "Dollar" && obj.Symbol == "$" && obj.Country == "USA"))
+            , Times.Once);
+
+            mockDbAccess.Verify(
+                dac => dac.Insert(
+                    It.Is<DataModels.RecognizedCurrency>(obj =>
+                        obj.Code == "BRL" && obj.Name == "Real" && obj.Symbol == "R$" && obj.Country == "Brasilien"))
+            , Times.Once);
+
+            mockDbAccess.Verify(dac => dac.Commit(), Times.Once);
+        }
+
     }// end of class XmlDataLoaderTest
 
 }// end of namespace CurrencyMonitor.DataAccess.UnitTests
