@@ -2,7 +2,6 @@ using System;
 using System.IO;
 
 using Moq;
-
 using Xunit;
 
 namespace CurrencyMonitor.DataAccess.UnitTests
@@ -34,14 +33,9 @@ namespace CurrencyMonitor.DataAccess.UnitTests
             var dataLoader = new XmlDataLoader(
                 new XmlMetadata("http://nichts.de", TestFilePath, SchemaDeploymentFilePath));
 
-            var mockDbAccess = new Mock<IDatabaseAccess>(MockBehavior.Strict);
-            mockDbAccess.Setup(
-                obj => obj.HasAny<DataModels.RecognizedCurrency>()
-            ).Returns(false);
-
-            Assert.Throws(exceptionType,
-                () => dataLoader.Load(XmlDataLoader.DataSet.Currencies, mockDbAccess.Object));
-
+            var mockDbAccess = new Mock<ITableAccess<DataModels.RecognizedCurrency>>(MockBehavior.Strict);
+            mockDbAccess.Setup(obj => obj.IsEmpty()).Returns(true);
+            Assert.Throws(exceptionType, () => dataLoader.Load(mockDbAccess.Object));
             mockDbAccess.Verify();
         }
 
@@ -53,18 +47,17 @@ namespace CurrencyMonitor.DataAccess.UnitTests
             var dataLoader = new XmlDataLoader(
                 new XmlMetadata(DeploymentXmlNamespace, TestFilePath, SchemaDeploymentFilePath));
 
-            var mockDbAccess = new Mock<IDatabaseAccess>(MockBehavior.Strict);
-            mockDbAccess.Setup(
-                obj => obj.HasAny<DataModels.RecognizedCurrency>()
-            ).Returns(false);
-
-            dataLoader.Load(XmlDataLoader.DataSet.Currencies, mockDbAccess.Object);
-
+            var mockDbAccess = new Mock<ITableAccess<DataModels.RecognizedCurrency>>(MockBehavior.Strict);
+            mockDbAccess.Setup(obj => obj.IsEmpty()).Returns(true);
+            mockDbAccess.Setup(obj => obj.Commit());
+            dataLoader.Load(mockDbAccess.Object);
             mockDbAccess.Verify();
         }
 
-        [Fact]
-        public void Load_Currencies_OneAvailable_ThenLoadIt()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void Load_Currencies_WhenOneAvailable_ThenLoadIfTableNotSeeded(bool isTableSeeded)
         {
             File.WriteAllText(TestFilePath,
                 CreateValidXml(new string[] {
@@ -75,27 +68,23 @@ namespace CurrencyMonitor.DataAccess.UnitTests
             var dataLoader = new XmlDataLoader(
                 new XmlMetadata(DeploymentXmlNamespace, TestFilePath, SchemaDeploymentFilePath));
 
-            var mockDbAccess = new Mock<IDatabaseAccess>(MockBehavior.Strict);
-
-            mockDbAccess.Setup(
-                obj => obj.HasAny<DataModels.RecognizedCurrency>()
-            ).Returns(false);
-
+            var mockDbAccess = new Mock<ITableAccess<DataModels.RecognizedCurrency>>(MockBehavior.Strict);
+            mockDbAccess.Setup(obj => obj.IsEmpty()).Returns(!isTableSeeded);
             mockDbAccess.Setup(obj => obj.Insert(It.IsAny<DataModels.RecognizedCurrency>()));
             mockDbAccess.Setup(obj => obj.Commit());
 
-            dataLoader.Load(XmlDataLoader.DataSet.Currencies, mockDbAccess.Object);
+            dataLoader.Load(mockDbAccess.Object);
 
-            mockDbAccess.Verify(
-                dac => dac.Insert(
-                    It.Is<DataModels.RecognizedCurrency>(obj =>
-                        obj.Code == "EUR" &&
-                        obj.Name == "Euro" &&
-                        obj.Symbol == "€" &&
-                        obj.Country == "EU"))
-            , Times.Once);
+            if (!isTableSeeded)
+            {
+                mockDbAccess.Verify(
+                    dac => dac.Insert(
+                        It.Is<DataModels.RecognizedCurrency>(obj =>
+                            obj.Code == "EUR" && obj.Name == "Euro" && obj.Symbol == "€" && obj.Country == "EU"))
+                , Times.Once);
 
-            mockDbAccess.Verify(dac => dac.Commit(), Times.Once);
+                mockDbAccess.Verify(dac => dac.Commit(), Times.Once);
+            }
         }
 
     }// end of class XmlDataLoaderTest

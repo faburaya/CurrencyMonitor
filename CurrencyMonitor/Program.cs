@@ -30,8 +30,9 @@ namespace CurrencyMonitor
                             System.IO.Path.Combine("Data", "deployment.xml"),
                             System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "deployment.xsd"))
                     );
-                    xmlDataLoader.Load(DataAccess.XmlDataLoader.DataSet.Currencies,
-                                       new DataAccess.DbAccessViaEF(dbContext));
+                    xmlDataLoader.Load(
+                        new DataAccess.SqlTableAccessViaEF<DataModels.RecognizedCurrency>(dbContext)
+                    );
                 }
                 catch (Exception ex)
                 {

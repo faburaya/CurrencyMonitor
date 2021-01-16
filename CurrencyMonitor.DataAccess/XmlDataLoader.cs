@@ -34,41 +34,19 @@ namespace CurrencyMonitor.DataAccess
             _metadata = metadata;
         }
 
-        public enum DataSet { Currencies }
-
         /// <summary>
-        /// Lädt die Daten aus der XML-Datei und speichert sie durch EF.
+        /// Lädt die Daten aus der XML-Datei und speichert sie in der Datenbank.
         /// </summary>
-        /// <param name="dataSet">Welche Daten geladen werden müssen.</param>
-        /// <param name="dbAccess">Gewährt Zugang auf Datenbank.</param>
-        public void Load(DataSet dataSet, IDatabaseAccess dbAccess)
+        /// <param name="dbAccess">Gewährt Zugang auf die Tabelle in der Datenbank.</param>
+        public void Load(ITableAccess<DataModels.RecognizedCurrency> dbAccess)
         {
-            bool isEmptyBatch = true;
-
-            switch (dataSet)
-            {
-                case DataSet.Currencies:
-                    isEmptyBatch = (LoadCurrencies(dbAccess) == 0);
-                    break;
-
-                default:
-                    throw new NotSupportedException($"DataSet {dataSet} ist nicht zum Laden unterstützt!");
-            }
-            
-            if (!isEmptyBatch)
-                dbAccess.Commit();
-        }
-
-        private int LoadCurrencies(IDatabaseAccess dbAccess)
-        {
-            if (dbAccess.HasAny<DataModels.RecognizedCurrency>())
-                return 0;
+            if (!dbAccess.IsEmpty())
+                return;
 
             XmlNamespaceManager nsManager = new XmlNamespaceManager(XmlDataSource.NameTable);
             nsManager.AddNamespace("tns", _metadata.XmlNamespace);
             const string xpath = "/tns:deployment/tns:currencies/tns:entry";
 
-            int loadCount = 0;
             foreach (XmlNode node in XmlDataSource.SelectNodes(xpath, nsManager))
             {
                 var entry = node as XmlElement;
@@ -82,10 +60,9 @@ namespace CurrencyMonitor.DataAccess
                 };
 
                 dbAccess.Insert(deserializedObject);
-                ++loadCount;
             }
 
-            return loadCount;
+            dbAccess.Commit();
         }
 
     } // end of class XmlDataLoader
