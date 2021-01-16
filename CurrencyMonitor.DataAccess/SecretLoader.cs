@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using System;
+using System.Xml;
 using System.Collections.Generic;
 
 namespace CurrencyMonitor.DataAccess
@@ -27,11 +28,16 @@ namespace CurrencyMonitor.DataAccess
         /// <summary>
         /// Bietet eine Verbindugszeichenkette für Datenbank.
         /// </summary>
-        /// <param name="name">Der Name der Verbindung.</param>
+        /// <param name="name">Der Name der gewünschten Verbindung.</param>
         /// <returns>Der geheime Teil der Verbindungszeichenkette: "Server;Database;User ID;Password;"</returns>
         public string GetDatabaseConnString(string name)
         {
-            return _dbConnStringsByName.TryGetValue(name, out string connectionString) ? connectionString : "[Verbindungszeichenkette der Datenbank nicht gefunden!];";
+            if (!_dbConnStringsByName.TryGetValue(name, out string connectionString))
+            {
+                throw new ApplicationException($"Die Verbindungszeichenkette '{name}' für die Datenbank konnte nicht aus der Geheimnissen herausgeholt werden!");
+            }
+
+            return connectionString;
         }
 
         private static Dictionary<string, string> LoadDatabaseConnectionStrings(XmlDocument dom,

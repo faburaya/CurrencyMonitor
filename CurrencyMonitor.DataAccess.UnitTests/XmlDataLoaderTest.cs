@@ -8,7 +8,7 @@ namespace CurrencyMonitor.DataAccess.UnitTests
 {
     public class XmlDataLoaderTest
     {
-        private string TestFilePath => "_test_.xml";
+        private string TestFilePath => "test_XmlDataLoader.xml";
 
         private string SchemaDeploymentFilePath => "deployment.xsd";
 
