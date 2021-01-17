@@ -52,10 +52,8 @@ namespace CurrencyMonitor.DataAccess
             foreach (XmlNode node in dom.SelectNodes(xpath, nsManager))
             {
                 var entry = node as XmlElement;
-
                 string connectionName = entry.GetAttribute("name");
-                string connectionString = $"Server={entry.GetAttribute("server")};Database={entry.GetAttribute("database")};User ID={entry.GetAttribute("userid")};Password={entry.GetAttribute("password")};";
-
+                string connectionString = entry.GetAttribute("string");
                 dbConnStringsByName.Add(connectionName, connectionString);
             }
 

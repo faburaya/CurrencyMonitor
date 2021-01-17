@@ -46,11 +46,16 @@ namespace CurrencyMonitor.DataAccess.UnitTests
             File.Delete(TestFilePath);
         }
 
+        private static string MakeXmlElementForConnection(string connName, string connString)
+        {
+            return $@"<connection name=""{connName}"" string=""{connString}"" />";
+        }
+
         [Fact]
         public void GetDatabaseConnString_WhenNameUnavailable_ThenThrow()
         {
             File.WriteAllText(TestFilePath, CreateValidXml(new string[] {
-                @"<connection name=""eins"" server=""Server1"" database=""Datenbank1"" userid=""Benutzer1"" password=""Passwort1"" />"
+                MakeXmlElementForConnection("eins", "Server=Server1;Database=Datenbank1;User ID=Benutzer1;Password=Passwort1;")
             }));
 
             var secretLoader = new SecretLoader(
@@ -64,14 +69,16 @@ namespace CurrencyMonitor.DataAccess.UnitTests
         [Fact]
         public void GetDatabaseConnString_WhenOneAvailable_ThenGiveIt()
         {
+            string expectedConnectionString = "Server=Server1;Database=Datenbank1;User ID=Benutzer1;Password=Passwort1;";
+
             File.WriteAllText(TestFilePath, CreateValidXml(new string[] {
-                @"<connection name=""eins"" server=""Server1"" database=""Datenbank1"" userid=""Benutzer1"" password=""Passwort1"" />"
+                MakeXmlElementForConnection("eins", expectedConnectionString)
             }));
 
             var secretLoader = new SecretLoader(
                 new XmlMetadata(DeploymentXmlNamespace, TestFilePath, SchemaDeploymentFilePath));
 
-            Assert.Equal("Server=Server1;Database=Datenbank1;User ID=Benutzer1;Password=Passwort1;", secretLoader.GetDatabaseConnString("eins"));
+            Assert.Equal(expectedConnectionString, secretLoader.GetDatabaseConnString("eins"));
 
             File.Delete(TestFilePath);
         }
@@ -79,20 +86,24 @@ namespace CurrencyMonitor.DataAccess.UnitTests
         [Fact]
         public void GetDatabaseConnString_WhenManyAvailable_ThenGiveThem()
         {
+            var expectedConnectionString = new string[] {
+                "Server=Server1;Database=Datenbank1;User ID=Benutzer1;Password=Passwort1;",
+                "Server=Server2;Database=Datenbank2;User ID=Benutzer2;Password=Passwort2;",
+                "Server=Server3;Database=Datenbank3;User ID=Benutzer3;Password=Passwort3;"
+            };
+
             File.WriteAllText(TestFilePath, CreateValidXml(new string[] {
-                @"<connection name=""eins"" server=""Server1"" database=""Datenbank1"" userid=""Benutzer1"" password=""Passwort1"" />",
-                @"<connection name=""zwei"" server=""Server2"" database=""Datenbank2"" userid=""Benutzer2"" password=""Passwort2"" />",
-                @"<connection name=""drei"" server=""Server3"" database=""Datenbank3"" userid=""Benutzer3"" password=""Passwort3"" />"
+                MakeXmlElementForConnection("eins", expectedConnectionString[0]),
+                MakeXmlElementForConnection("zwei", expectedConnectionString[1]),
+                MakeXmlElementForConnection("drei", expectedConnectionString[2])
             }));
 
             var secretLoader = new SecretLoader(
                 new XmlMetadata(DeploymentXmlNamespace, TestFilePath, SchemaDeploymentFilePath));
 
-            Assert.Equal("Server=Server1;Database=Datenbank1;User ID=Benutzer1;Password=Passwort1;", secretLoader.GetDatabaseConnString("eins"));
-
-            Assert.Equal("Server=Server2;Database=Datenbank2;User ID=Benutzer2;Password=Passwort2;", secretLoader.GetDatabaseConnString("zwei"));
-
-            Assert.Equal("Server=Server3;Database=Datenbank3;User ID=Benutzer3;Password=Passwort3;", secretLoader.GetDatabaseConnString("drei"));
+            Assert.Equal(expectedConnectionString[0], secretLoader.GetDatabaseConnString("eins"));
+            Assert.Equal(expectedConnectionString[1], secretLoader.GetDatabaseConnString("zwei"));
+            Assert.Equal(expectedConnectionString[2], secretLoader.GetDatabaseConnString("drei"));
 
             File.Delete(TestFilePath);
         }
