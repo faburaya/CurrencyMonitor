@@ -9,7 +9,7 @@ namespace CurrencyMonitor.DataAccess
     /// Generische Schnittstelle, die Zugang auf die Azure Cosmos Datenbank gewährt.
     /// </summary>
     /// <typeparam name="ItemType">Der Typ in der Datenbank, mit dem man umgehen will.</typeparam>
-    public interface ICosmosDbService<ItemType> where ItemType : ICosmosDbItem
+    public interface ICosmosDbService<ItemType>
     {
         Task AddItemAsync(ItemType item);
         Task DeleteItemAsync(string key);

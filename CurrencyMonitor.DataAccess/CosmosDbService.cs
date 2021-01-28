@@ -1,6 +1,6 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 
 using Microsoft.Azure.Cosmos;
 
@@ -9,10 +9,27 @@ namespace CurrencyMonitor.DataAccess
     /// <summary>
     /// Implementierung für einen Diest, der Zugang auf Azure Cosmos Datenbank gewährt.
     /// </summary>
-    public class CosmosDbService<ItemType> : ICosmosDbService<ItemType>
-        where ItemType : DataModels.ICosmosDbItem
+    public class CosmosDbService<ItemType> : ICosmosDbService<ItemType> where ItemType : class
     {
         private readonly Container _container;
+
+        /// <summary>
+        /// Creates a Cosmos DB database and a container with the specified partition key. 
+        /// </summary>
+        /// <returns></returns>
+        private static async Task<CosmosDbService<ItemType>> InitializeCosmosClientInstanceAsync(
+            string databaseName,
+            string containerName,
+            string connectionString)
+        {
+            var client = new CosmosClient(connectionString);
+            var service = new CosmosDbService<ItemType>(client, databaseName, containerName);
+            DatabaseResponse response = await client.CreateDatabaseIfNotExistsAsync(databaseName);
+            await response.Database.CreateContainerIfNotExistsAsync(
+                containerName, DataModels.CosmosDbItem<ItemType>.PartitionKeyPath);
+
+            return service;
+        }
 
         public CosmosDbService(CosmosClient dbClient, string databaseName, string containerName)
         {
@@ -21,7 +38,9 @@ namespace CurrencyMonitor.DataAccess
 
         public async Task AddItemAsync(ItemType item)
         {
-            await _container.CreateItemAsync(item, new PartitionKey(item.PartitionKey));
+            await _container.CreateItemAsync(item,
+                new PartitionKey(new DataModels.CosmosDbItem<ItemType>(item).PartitionKeyValue)
+            );
         }
 
         public async Task DeleteItemAsync(string key)
