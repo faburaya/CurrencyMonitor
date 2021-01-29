@@ -50,7 +50,7 @@ namespace CurrencyMonitor.DataModels
                 throw new NotSupportedException($"Der Pfad für den Partitionsschlüssel der Datenbank kann nicht festgestellt werden: an dem Typ {typeof(ItemType).Name} fehlt ein Property mit dem Attribut [PartitionKey]!");
             }
 
-            if (properties.Count() > 0)
+            if (properties.Count() > 1)
             {
                 throw new NotSupportedException($"Der Pfad für den Partitionsschlüssel der Datenbank kann nicht festgestellt werden: der Typ {typeof(ItemType).Name} hat mehr als ein Property mit dem Attribut [PartitionKey]!");
             }
@@ -62,6 +62,7 @@ namespace CurrencyMonitor.DataModels
                     .FirstOrDefault() is JsonPropertyNameAttribute jsonSerialization)
             {
                 PartitionKeyPath = $"/{jsonSerialization.Name}";
+                return;
             }
 
             throw new NotSupportedException($"Der Pfad für den Partitionsschlüssel der Datenbank kann nicht festgestellt werden: der Partitionsschlüssel {partitionKeyProperty.Name} fehlt das Attribut [JsonPropertyName].");
