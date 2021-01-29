@@ -26,7 +26,7 @@ namespace CurrencyMonitor.DataAccess
             var service = new CosmosDbService<ItemType>(client, databaseName, containerName);
             DatabaseResponse response = await client.CreateDatabaseIfNotExistsAsync(databaseName);
             await response.Database.CreateContainerIfNotExistsAsync(
-                containerName, DataModels.CosmosDbItem<ItemType>.PartitionKeyPath);
+                containerName, CosmosDbItem<ItemType>.PartitionKeyPath);
 
             return service;
         }
@@ -39,7 +39,7 @@ namespace CurrencyMonitor.DataAccess
         public async Task AddItemAsync(ItemType item)
         {
             await _container.CreateItemAsync(item,
-                new PartitionKey(new DataModels.CosmosDbItem<ItemType>(item).PartitionKeyValue)
+                new PartitionKey(new CosmosDbItem<ItemType>(item).PartitionKeyValue)
             );
         }
 

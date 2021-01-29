@@ -5,7 +5,9 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Reflection;
 
-namespace CurrencyMonitor.DataModels
+using CurrencyMonitor.DataModels;
+
+namespace CurrencyMonitor.DataAccess
 {
     /// <summary>
     /// Einrichtung um einen Typ herum, der als Element der Datenbank dient.
@@ -70,4 +72,4 @@ namespace CurrencyMonitor.DataModels
 
     }// end of class CosmosDbItem
 
-}// end of namespace CurrencyMonitor.DataModels
+}// end of namespace CurrencyMonitor.DataAccess
