@@ -12,9 +12,10 @@ namespace CurrencyMonitor.DataAccess
     public interface ICosmosDbService<ItemType>
     {
         Task AddItemAsync(ItemType item);
-        Task DeleteItemAsync(string key);
-        Task<ItemType> GetItemAsync(string key);
+        Task DeleteItemAsync(string partitionKey, int id);
+        Task<ItemType> GetItemAsync(string partitionKey, int id);
+        Task<int> GetItemCount();
         Task<IEnumerable<ItemType>> QueryAsync(string queryString);
-        Task UpdateItemAsync(string key, ItemType item);
+        Task UpdateItemAsync(ItemType item);
     }
 }

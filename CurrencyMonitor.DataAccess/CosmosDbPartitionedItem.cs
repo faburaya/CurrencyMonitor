@@ -12,11 +12,11 @@ namespace CurrencyMonitor.DataAccess
     /// <summary>
     /// Einrichtung um einen Typ herum, der als Element der Datenbank dient.
     /// </summary>
-    public class CosmosDbItem<ItemType> where ItemType : class
+    public class CosmosDbPartitionedItem<ItemType> where ItemType : class
     {
         private ItemType Item { get; }
 
-        public CosmosDbItem(ItemType item)
+        public CosmosDbPartitionedItem(ItemType item)
         {
             this.Item = item;
         }
@@ -39,7 +39,7 @@ namespace CurrencyMonitor.DataAccess
         /// Findet den Pfad des Partitionsschlüssels, der von einem Attribut markiert ist,
         /// und dessen Namen den Namen in der JSON-Serialisierung gleicht.
         /// </summary>
-        static CosmosDbItem()
+        static CosmosDbPartitionedItem()
         {
             IEnumerable<PropertyInfo> properties = (
                 from property in typeof(ItemType).GetProperties()

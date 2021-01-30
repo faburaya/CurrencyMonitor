@@ -7,12 +7,12 @@ using Xunit;
 
 namespace CurrencyMonitor.DataAccess.UnitTests
 {
-    public class CosmosDbItemTest
+    public class CosmosDbPartitionedItemTest
     {
         private void LoadItemType_Throws<ItemType>() where ItemType : class
         {
             Exception thrownException = Assert.ThrowsAny<Exception>(
-                () => CosmosDbItem<ItemType>.PartitionKeyPath);
+                () => CosmosDbPartitionedItem<ItemType>.PartitionKeyPath);
 
             while (thrownException.InnerException != null)
                 thrownException = thrownException.InnerException;
@@ -41,17 +41,17 @@ namespace CurrencyMonitor.DataAccess.UnitTests
         [Fact]
         public void GetPartitionKeyPath()
         {
-            Assert.Equal("/id", CosmosDbItem<TestClassItem>.PartitionKeyPath);
+            Assert.Equal("/key", CosmosDbPartitionedItem<TestClassItem>.PartitionKeyPath);
         }
 
         [Fact]
         public void GetPartitionKeyValue()
         {
-            var obj = new TestClassItem { Id = "Identifikation", Value = "Wert" };
-            var dbItem = new CosmosDbItem<TestClassItem>(obj);
-            Assert.Equal(obj.Id, dbItem.PartitionKeyValue);
-            obj.Id = "Etwas Anderes";
-            Assert.Equal(obj.Id, dbItem.PartitionKeyValue);
+            var obj = new TestClassItem { Key = "Schlüssel", Value = "Wert" };
+            var dbItem = new CosmosDbPartitionedItem<TestClassItem>(obj);
+            Assert.Equal(obj.Key, dbItem.PartitionKeyValue);
+            obj.Key = "Etwas Anderes";
+            Assert.Equal(obj.Key, dbItem.PartitionKeyValue);
         }
     }
 
@@ -61,8 +61,8 @@ namespace CurrencyMonitor.DataAccess.UnitTests
     internal class TestClassItem
     {
         [PartitionKey]
-        [JsonPropertyName("id")]
-        public string Id { get; set; }
+        [JsonPropertyName("key")]
+        public string Key { get; set; }
 
         public string Value { get; set; }
     }
@@ -73,8 +73,8 @@ namespace CurrencyMonitor.DataAccess.UnitTests
     /// </summary>
     internal class TestClassItemNoKey
     {
-        [JsonPropertyName("id")]
-        public string Id { get; set; }
+        [JsonPropertyName("key")]
+        public string Key { get; set; }
 
         [JsonPropertyName("value")]
         public string Value { get; set; }
@@ -87,7 +87,7 @@ namespace CurrencyMonitor.DataAccess.UnitTests
     internal class TestClassItemKeyLacksJson
     {
         [PartitionKey]
-        public string Id { get; set; }
+        public string Key { get; set; }
 
         [JsonPropertyName("value")]
         public string Value { get; set; }
@@ -100,8 +100,8 @@ namespace CurrencyMonitor.DataAccess.UnitTests
     internal class TestClassItemWithTwoKeys
     {
         [PartitionKey]
-        [JsonPropertyName("id")]
-        public string Id { get; set; }
+        [JsonPropertyName("key")]
+        public string Key { get; set; }
 
         [PartitionKey]
         public string Value { get; set; }
