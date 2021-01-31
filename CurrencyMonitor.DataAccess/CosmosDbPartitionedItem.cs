@@ -26,6 +26,29 @@ namespace CurrencyMonitor.DataAccess
             return JsonSerializer.Serialize(this.Item);
         }
 
+        private static readonly PropertyInfo[] serializableProperties;
+
+        /// <summary>
+        /// Erstellt ein ID-Nummer für das enthaltede Element.
+        /// </summary>
+        /// <remarks>
+        /// Die Nummer ist eingentlich ein Hash-Code, das berechnet wird, sodass nur die
+        /// JSON-serialisierbaren Properties berücksichtigt werden. Auf diese Weise sind
+        /// die ID-Nummern von zwei Elementen gleich, wenn deren JSON-Serialisierung gleich
+        /// sind. Das heißt: diese ID-Nummern absichtlich zusammenstoßen, wenn man versucht,
+        /// gleiche Elemente in der selben Partition der Cosmos Datenbank zu speichern.
+        /// </remarks>
+        /// <returns>Die erstellte Identifikationsnummer.</returns>
+        public static int GenerateIdFor(ItemType item)
+        {
+            int hashCode = 7;
+            foreach (PropertyInfo property in serializableProperties)
+            {
+                hashCode = 31 * hashCode + property.GetValue(item).GetHashCode();
+            }
+            return hashCode;
+        }
+
         private static readonly PropertyInfo partitionKeyProperty;
 
         public string PartitionKeyValue => (string)partitionKeyProperty.GetValue(this.Item);
@@ -51,6 +74,10 @@ namespace CurrencyMonitor.DataAccess
 
             ContainerName = containerAttribute.Name;
 
+            serializableProperties = (from property in typeof(ItemType).GetProperties()
+                                      where property.GetCustomAttribute<JsonPropertyNameAttribute>() != null
+                                      select property).ToArray();
+
             IEnumerable<PropertyInfo> properties = (
                 from property in typeof(ItemType).GetProperties()
                 where property.GetCustomAttribute<CosmosPartitionKeyAttribute>() != null
@@ -59,7 +86,7 @@ namespace CurrencyMonitor.DataAccess
 
             if (!properties.Any())
             {
-                throw new NotSupportedException($"Der Pfad für den Partitionsschlüssel der Datenbank kann nicht festgestellt werden: an dem Typ {typeof(ItemType).Name} fehlt ein Property mit dem Attribut [CosmosPartitionKey]!");
+                throw new NotSupportedException($"Der Pfad für den Partitionsschlüssel der Datenbank kann nicht festgestellt werden: an dem Typ {typeof(ItemType).Name} fehlt ein Property mit dem Attributen [CosmosPartitionKey] und [JsonPropertyName]!");
             }
 
             if (properties.Count() > 1)

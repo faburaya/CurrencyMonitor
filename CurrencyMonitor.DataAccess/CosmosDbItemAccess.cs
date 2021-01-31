@@ -6,17 +6,17 @@ using System.Threading.Tasks;
 namespace CurrencyMonitor.DataAccess
 {
     /// <summary>
-    /// Gewährt Zugang auf ein Dokument in Azure Cosmos Datenbank.
+    /// Gewährt Zugang auf ein Element in Azure Cosmos Datenbank.
     /// </summary>
-    public class CosmosDocumentAccess<DataType>
+    public class CosmosDbItemAccess<DataType>
         : ITableAccess<DataType>
         where DataType : DataModels.CosmosDbItem
     {
-        private CosmosDbService<DataType> DatabaseService { get; }
+        private ICosmosDbService<DataType> DatabaseService { get; }
 
         private List<Task> Insertions { get; }
 
-        public CosmosDocumentAccess(CosmosDbService<DataType> dbService)
+        public CosmosDbItemAccess(ICosmosDbService<DataType> dbService)
         {
             this.DatabaseService = dbService;
             this.Insertions = new List<Task>();
@@ -24,7 +24,7 @@ namespace CurrencyMonitor.DataAccess
 
         public bool IsEmpty()
         {
-            return (DatabaseService.GetItemCount().Result > 0);
+            return (DatabaseService.GetItemCountAsync().Result > 0);
         }
 
         public void Insert(DataType obj)

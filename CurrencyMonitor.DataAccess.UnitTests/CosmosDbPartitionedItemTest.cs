@@ -53,11 +53,68 @@ namespace CurrencyMonitor.DataAccess.UnitTests
         [Fact]
         public void GetPartitionKeyValue()
         {
-            var obj = new TestClassItem { Key = "Schlüssel", Value = "Wert" };
+            var obj = new TestClassItem { Key = "Schlüssel", Value = 32 };
             var dbItem = new CosmosDbPartitionedItem<TestClassItem>(obj);
             Assert.Equal(obj.Key, dbItem.PartitionKeyValue);
             obj.Key = "Etwas Anderes";
             Assert.Equal(obj.Key, dbItem.PartitionKeyValue);
+        }
+
+        [Fact]
+        public void CreateIdFor_WhenItemsEqual_ThenSameId()
+        {
+            var obj1 = new TestClassItem { Key = "Schlüssel", Value = 32 };
+            var obj2 = new TestClassItem { Key = "Schlüssel", Value = 32 };
+
+            Assert.Equal(
+                CosmosDbPartitionedItem<TestClassItem>.GenerateIdFor(obj1),
+                CosmosDbPartitionedItem<TestClassItem>.GenerateIdFor(obj1)
+            );
+
+            Assert.Equal(
+                CosmosDbPartitionedItem<TestClassItem>.GenerateIdFor(obj2),
+                CosmosDbPartitionedItem<TestClassItem>.GenerateIdFor(obj2)
+            );
+
+            Assert.Equal(
+                CosmosDbPartitionedItem<TestClassItem>.GenerateIdFor(obj1),
+                CosmosDbPartitionedItem<TestClassItem>.GenerateIdFor(obj2)
+            );
+        }
+
+        [Fact]
+        public void CreateIdFor_WhenItemsDifferent_ThenDifferentId()
+        {
+            var obj1 = new TestClassItem { Key = "Schlüssel", Value = 32 };
+            var obj2 = new TestClassItem { Key = "Schlüssel", Value = 1 };
+            var obj3 = new TestClassItem { Key = "Tür", Value = 32 };
+
+            Assert.NotEqual(
+                CosmosDbPartitionedItem<TestClassItem>.GenerateIdFor(obj1),
+                CosmosDbPartitionedItem<TestClassItem>.GenerateIdFor(obj2)
+            );
+
+            Assert.NotEqual(
+                CosmosDbPartitionedItem<TestClassItem>.GenerateIdFor(obj1),
+                CosmosDbPartitionedItem<TestClassItem>.GenerateIdFor(obj3)
+            );
+
+            Assert.NotEqual(
+                CosmosDbPartitionedItem<TestClassItem>.GenerateIdFor(obj2),
+                CosmosDbPartitionedItem<TestClassItem>.GenerateIdFor(obj3)
+            );
+        }
+
+        [Fact]
+        public void CreateIdFor_WhenDifferenceIrrelevant_ThenSameId()
+        {
+            var obj1 = new TestClassItem { Key = "Schlüssel", Value = 32, IrrelevantForIdGeneration = 1 };
+            var obj2 = new TestClassItem { Key = "Schlüssel", Value = 32, IrrelevantForIdGeneration = 100 };
+
+            Assert.Equal(
+                CosmosDbPartitionedItem<TestClassItem>.GenerateIdFor(obj1),
+                CosmosDbPartitionedItem<TestClassItem>.GenerateIdFor(obj2)
+            );
         }
     }
 
@@ -71,7 +128,10 @@ namespace CurrencyMonitor.DataAccess.UnitTests
         [JsonPropertyName("key")]
         public string Key { get; set; }
 
-        public string Value { get; set; }
+        [JsonPropertyName("value")]
+        public int Value { get; set; }
+
+        public int IrrelevantForIdGeneration { get; set; }
     }
 
     /// <summary>

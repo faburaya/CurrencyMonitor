@@ -44,7 +44,7 @@ namespace CurrencyMonitor.DataAccess
             _container = dbClient.GetContainer(databaseName, containerName);
         }
 
-        private static string FormatID(int id) => id.ToString("X4");
+        private static string FormatID(int id) => id.ToString("X");
 
         /// <summary>
         /// Fügt ein neues Element in der Datenbank hinzu.
@@ -52,7 +52,7 @@ namespace CurrencyMonitor.DataAccess
         /// <param name="item">Das zu speichernde Element.</param>
         public async Task AddItemAsync(ItemType item)
         {
-            item.Id = item.GetHashCode(); // erstellt ein gut genug ID
+            item.Id = CosmosDbPartitionedItem<ItemType>.GenerateIdFor(item);
             await _container.CreateItemAsync(item,
                 new PartitionKey(new CosmosDbPartitionedItem<ItemType>(item).PartitionKeyValue)
             );
@@ -94,7 +94,7 @@ namespace CurrencyMonitor.DataAccess
         /// Wie viele Element des Typs in der Datenbank dastehen,
         /// oder eine negative Nummer, wenn es einen Fehler gibt.
         /// </returns>
-        public async Task<int> GetItemCount()
+        public async Task<int> GetItemCountAsync()
         {
             using var query = _container.GetItemQueryIterator<int>(
                 "select value count(1) from c",
