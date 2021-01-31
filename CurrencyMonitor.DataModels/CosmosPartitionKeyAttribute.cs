@@ -6,7 +6,7 @@ namespace CurrencyMonitor.DataModels
     /// Attribute für ein Property, das als Partitions Schlüssel in der Datenbank dient.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
-    public sealed class PartitionKeyAttribute : Attribute
+    public sealed class CosmosPartitionKeyAttribute : Attribute
     {
         public bool IsDatabasePartitionKey => true;
 

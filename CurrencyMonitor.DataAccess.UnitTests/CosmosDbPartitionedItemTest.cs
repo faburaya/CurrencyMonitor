@@ -39,6 +39,12 @@ namespace CurrencyMonitor.DataAccess.UnitTests
         }
 
         [Fact]
+        public void LoadItemType_WhenNoContainer_ThenThrow()
+        {
+            LoadItemType_Throws<TestClassItemNoContainer>();
+        }
+
+        [Fact]
         public void GetPartitionKeyPath()
         {
             Assert.Equal("/key", CosmosDbPartitionedItem<TestClassItem>.PartitionKeyPath);
@@ -58,9 +64,23 @@ namespace CurrencyMonitor.DataAccess.UnitTests
     /// <summary>
     /// Dieser Type sollte als Element der Datenbank gut funktionieren.
     /// </summary>
+    [CosmosContainer(Name = "box")]
     internal class TestClassItem
     {
-        [PartitionKey]
+        [CosmosPartitionKey]
+        [JsonPropertyName("key")]
+        public string Key { get; set; }
+
+        public string Value { get; set; }
+    }
+
+    /// <summary>
+    /// Dieser Type funktioniert nicht als Element:
+    /// ihm felht der Name des Containers.
+    /// </summary>
+    internal class TestClassItemNoContainer
+    {
+        [CosmosPartitionKey]
         [JsonPropertyName("key")]
         public string Key { get; set; }
 
@@ -71,6 +91,7 @@ namespace CurrencyMonitor.DataAccess.UnitTests
     /// Dieser Type funktioniert nicht als Element:
     /// Partitionsschlüssel nicht vorhanden.
     /// </summary>
+    [CosmosContainer(Name = "box")]
     internal class TestClassItemNoKey
     {
         [JsonPropertyName("key")]
@@ -84,9 +105,10 @@ namespace CurrencyMonitor.DataAccess.UnitTests
     /// Dieser Type funktioniert nicht als Element:
     /// Es fehlt dem Partitionsschlüssel ein Name aus JSON-Serialisierung.
     /// </summary>
+    [CosmosContainer(Name = "box")]
     internal class TestClassItemKeyLacksJson
     {
-        [PartitionKey]
+        [CosmosPartitionKey]
         public string Key { get; set; }
 
         [JsonPropertyName("value")]
@@ -97,13 +119,14 @@ namespace CurrencyMonitor.DataAccess.UnitTests
     /// Dieser Type funktioniert nicht als Element:
     /// Nur ein einzelner Partitionsschlüssel ist erlaubt.
     /// </summary>
+    [CosmosContainer(Name = "box")]
     internal class TestClassItemWithTwoKeys
     {
-        [PartitionKey]
+        [CosmosPartitionKey]
         [JsonPropertyName("key")]
         public string Key { get; set; }
 
-        [PartitionKey]
+        [CosmosPartitionKey]
         public string Value { get; set; }
     }
 
