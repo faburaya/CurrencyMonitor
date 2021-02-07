@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Microsoft.Azure.Cosmos;
+using Microsoft.Azure.Cosmos.Linq;
 
 namespace CurrencyMonitor.DataAccess
 {
@@ -22,50 +23,47 @@ namespace CurrencyMonitor.DataAccess
         /// <see cref="CosmosDbService{ItemType}"/> ab.
         /// </summary>
         /// <param name="databaseName">Der Name der Datenbank.</param>
-        /// <param name="containerName">Der Name des Containers.</param>
         /// <param name="connectionString">The Verbindungszeichenfolge für die Datenbank.</param>
         /// <returns>Die erstellte Instanz von <see cref="CosmosDbService{ItemType}"/></returns>
-        public static async Task<CosmosDbService<ItemType>> InitializeCosmosClientInstanceAsync(
-            string databaseName,
-            string containerName,
-            string connectionString)
+        public static async Task<CosmosDbService<ItemType>> InitializeCosmosClientInstanceAsync(string databaseName, string connectionString)
         {
             var client = new CosmosClient(connectionString);
-            var service = new CosmosDbService<ItemType>(client, databaseName, containerName);
+            var service = new CosmosDbService<ItemType>(client, databaseName);
             DatabaseResponse response = await client.CreateDatabaseIfNotExistsAsync(databaseName);
             await response.Database.CreateContainerIfNotExistsAsync(
-                containerName, CosmosDbPartitionedItem<ItemType>.PartitionKeyPath);
+                CosmosDbPartitionedItem<ItemType>.ContainerName,
+                CosmosDbPartitionedItem<ItemType>.PartitionKeyPath);
 
             return service;
         }
 
-        private CosmosDbService(CosmosClient dbClient, string databaseName, string containerName)
+        private CosmosDbService(CosmosClient dbClient, string databaseName)
         {
-            _container = dbClient.GetContainer(databaseName, containerName);
+            _container = dbClient.GetContainer(databaseName, CosmosDbPartitionedItem<ItemType>.ContainerName);
         }
 
         private static string FormatID(int id) => id.ToString("X");
 
         /// <summary>
-        /// Fügt ein neues Element in der Datenbank hinzu.
+        /// Fragt die Datenbank ab.
         /// </summary>
-        /// <param name="item">Das zu speichernde Element.</param>
-        public async Task AddItemAsync(ItemType item)
+        /// <param name="query">Die LINQ-Abfrage.</param>
+        /// <returns>Die von der Abfrage zurückgegebenen Elemente.</returns>
+        public async Task<IEnumerable<ItemType>> QueryAsync(
+            Func<IOrderedQueryable<ItemType>, IQueryable<ItemType>> query)
         {
-            item.Id = CosmosDbPartitionedItem<ItemType>.GenerateIdFor(item);
-            await _container.CreateItemAsync(item,
-                new PartitionKey(new CosmosDbPartitionedItem<ItemType>(item).PartitionKeyValue)
-            );
-        }
+            var results = new List<ItemType>();
 
-        /// <summary>
-        /// Löscht ein Element in der Datenbank.
-        /// </summary>
-        /// <param name="partitionKey">Der Partitionsschlüssel.</param>
-        /// <param name="id">Die Identifikation des Elements.</param>
-        public async Task DeleteItemAsync(string partitionKey, int id)
-        {
-            await _container.DeleteItemAsync<ItemType>(FormatID(id), new PartitionKey(partitionKey));
+            using FeedIterator<ItemType> iterator =
+                query(_container.GetItemLinqQueryable<ItemType>()).ToFeedIterator();
+
+            while (iterator.HasMoreResults)
+            {
+                FeedResponse<ItemType> response = await iterator.ReadNextAsync();
+                results.AddRange(response);
+            }
+
+            return results;
         }
 
         /// <summary>
@@ -96,7 +94,7 @@ namespace CurrencyMonitor.DataAccess
         /// </returns>
         public async Task<int> GetItemCountAsync()
         {
-            using var query = _container.GetItemQueryIterator<int>(
+            using FeedIterator<int> query = _container.GetItemQueryIterator<int>(
                 "select value count(1) from c",
                 requestOptions: new QueryRequestOptions { MaxItemCount = -1 }
             );
@@ -107,35 +105,34 @@ namespace CurrencyMonitor.DataAccess
             }
 
             var response = await query.ReadNextAsync();
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            if (response.StatusCode != System.Net.HttpStatusCode.OK)
             {
-                return response.First();
+                throw new ApplicationException("Datenbankabfrage für Anzahl von Elementen ist gescheitert!");
             }
 
-            throw new ApplicationException("Datenbankabfrage für Anzahl von Elementen ist gescheitert!");
+            return response.First();
         }
 
         /// <summary>
-        /// Fragt die Datenbank ab.
+        /// Fügt ein neues Element in der Datenbank hinzu.
         /// </summary>
-        /// <param name="queryString">Die SQL-Abfrage.</param>
-        /// <returns>Die von der Abfrage zurückgegebenen Elemente.</returns>
-        public async Task<IEnumerable<ItemType>> QueryAsync(string queryString)
+        /// <param name="item">Das zu speichernde Element.</param>
+        public async Task AddItemAsync(ItemType item)
         {
-            var query = _container.GetItemQueryIterator<ItemType>(new QueryDefinition(queryString));
-            List<ItemType> results = new List<ItemType>();
-            while (query.HasMoreResults)
-            {
-                var response = await query.ReadNextAsync();
-                if (response.StatusCode != System.Net.HttpStatusCode.OK)
-                {
-                    throw new ApplicationException("Datenbankabfrage ist gescheitert!");
-                }
+            item.Id = CosmosDbPartitionedItem<ItemType>.GenerateIdFor(item);
+            await _container.CreateItemAsync(item,
+                new PartitionKey(new CosmosDbPartitionedItem<ItemType>(item).PartitionKeyValue)
+            );
+        }
 
-                results.AddRange(response.ToList());
-            }
-
-            return results;
+        /// <summary>
+        /// Löscht ein Element in der Datenbank.
+        /// </summary>
+        /// <param name="partitionKey">Der Partitionsschlüssel.</param>
+        /// <param name="id">Die Identifikation des Elements.</param>
+        public async Task DeleteItemAsync(string partitionKey, int id)
+        {
+            await _container.DeleteItemAsync<ItemType>(FormatID(id), new PartitionKey(partitionKey));
         }
 
         /// <summary>

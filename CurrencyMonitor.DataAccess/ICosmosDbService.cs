@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-
-using CurrencyMonitor.DataModels;
 
 namespace CurrencyMonitor.DataAccess
 {
@@ -11,11 +11,16 @@ namespace CurrencyMonitor.DataAccess
     /// <typeparam name="ItemType">Der Typ in der Datenbank, mit dem man umgehen will.</typeparam>
     public interface ICosmosDbService<ItemType>
     {
-        Task AddItemAsync(ItemType item);
-        Task DeleteItemAsync(string partitionKey, int id);
+        Task<IEnumerable<ItemType>> QueryAsync(Func<IOrderedQueryable<ItemType>, IQueryable<ItemType>>  query);
+
         Task<ItemType> GetItemAsync(string partitionKey, int id);
+
         Task<int> GetItemCountAsync();
-        Task<IEnumerable<ItemType>> QueryAsync(string queryString);
+
+        Task AddItemAsync(ItemType item);
+
+        Task DeleteItemAsync(string partitionKey, int id);
+
         Task UpdateItemAsync(ItemType item);
     }
 }
