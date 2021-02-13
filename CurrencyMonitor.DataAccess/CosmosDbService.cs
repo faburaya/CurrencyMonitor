@@ -121,7 +121,7 @@ namespace CurrencyMonitor.DataAccess
         {
             item.Id = CosmosDbPartitionedItem<ItemType>.GenerateIdFor(item);
             await _container.CreateItemAsync(item,
-                new PartitionKey(new CosmosDbPartitionedItem<ItemType>(item).PartitionKeyValue)
+                new PartitionKey(CosmosDbPartitionedItem<ItemType>.GetPartitionKeyValue(item))
             );
         }
 
@@ -142,7 +142,7 @@ namespace CurrencyMonitor.DataAccess
         public async Task UpdateItemAsync(ItemType item)
         {
             await _container.UpsertItemAsync(item,
-                new PartitionKey(new CosmosDbPartitionedItem<ItemType>(item).PartitionKeyValue)
+                new PartitionKey(CosmosDbPartitionedItem<ItemType>.GetPartitionKeyValue(item))
             );
         }
 

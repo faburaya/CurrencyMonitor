@@ -12,18 +12,11 @@ namespace CurrencyMonitor.DataAccess
     /// <summary>
     /// Einrichtung um einen Typ herum, der als Element der Datenbank dient.
     /// </summary>
-    public class CosmosDbPartitionedItem<ItemType> where ItemType : class
+    public static class CosmosDbPartitionedItem<ItemType> where ItemType : class
     {
-        private ItemType Item { get; }
-
-        public CosmosDbPartitionedItem(ItemType item)
+        public static string SerializeToJson(ItemType item)
         {
-            this.Item = item;
-        }
-
-        public string SerializeToJson()
-        {
-            return JsonSerializer.Serialize(this.Item);
+            return JsonSerializer.Serialize(item);
         }
 
         private static readonly PropertyInfo[] serializableProperties;
@@ -51,7 +44,10 @@ namespace CurrencyMonitor.DataAccess
 
         private static readonly PropertyInfo partitionKeyProperty;
 
-        public string PartitionKeyValue => (string)partitionKeyProperty.GetValue(this.Item);
+        public static string GetPartitionKeyValue(ItemType item)
+        {
+            return (string)partitionKeyProperty.GetValue(item);
+        }
 
         public static string PartitionKeyPath { get; }
 

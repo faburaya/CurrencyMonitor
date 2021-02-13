@@ -53,11 +53,10 @@ namespace CurrencyMonitor.DataAccess.UnitTests
         [Fact]
         public void GetPartitionKeyValue()
         {
-            var obj = new TestClassItem { Key = "Schlüssel", Value = 32 };
-            var dbItem = new CosmosDbPartitionedItem<TestClassItem>(obj);
-            Assert.Equal(obj.Key, dbItem.PartitionKeyValue);
+            var obj = new TestClassItem { Key = "Schlüssel", Value = 32 };;
+            Assert.Equal(obj.Key, CosmosDbPartitionedItem<TestClassItem>.GetPartitionKeyValue(obj));
             obj.Key = "Etwas Anderes";
-            Assert.Equal(obj.Key, dbItem.PartitionKeyValue);
+            Assert.Equal(obj.Key, CosmosDbPartitionedItem<TestClassItem>.GetPartitionKeyValue(obj));
         }
 
         [Fact]
