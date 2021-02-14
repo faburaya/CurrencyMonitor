@@ -5,9 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Reflection;
 
-using CurrencyMonitor.DataModels;
-
-namespace CurrencyMonitor.DataAccess
+namespace CurrencyMonitor.DataModels
 {
     /// <summary>
     /// Einrichtung um einen Typ herum, der als Element der Datenbank dient.
@@ -74,11 +72,11 @@ namespace CurrencyMonitor.DataAccess
                                       where property.GetCustomAttribute<JsonPropertyNameAttribute>() != null
                                       select property).ToArray();
 
-            IEnumerable<PropertyInfo> properties = (
+            IEnumerable<PropertyInfo> properties =
                 from property in typeof(ItemType).GetProperties()
                 where property.GetCustomAttribute<CosmosPartitionKeyAttribute>() != null
                 select property
-            );
+            ;
 
             if (!properties.Any())
             {

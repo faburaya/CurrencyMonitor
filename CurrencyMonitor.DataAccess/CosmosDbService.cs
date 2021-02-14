@@ -31,15 +31,15 @@ namespace CurrencyMonitor.DataAccess
             var service = new CosmosDbService<ItemType>(client, databaseName);
             DatabaseResponse response = await client.CreateDatabaseIfNotExistsAsync(databaseName);
             await response.Database.CreateContainerIfNotExistsAsync(
-                CosmosDbPartitionedItem<ItemType>.ContainerName,
-                CosmosDbPartitionedItem<ItemType>.PartitionKeyPath);
+                DataModels.CosmosDbPartitionedItem<ItemType>.ContainerName,
+                DataModels.CosmosDbPartitionedItem<ItemType>.PartitionKeyPath);
 
             return service;
         }
 
         private CosmosDbService(CosmosClient dbClient, string databaseName)
         {
-            _container = dbClient.GetContainer(databaseName, CosmosDbPartitionedItem<ItemType>.ContainerName);
+            _container = dbClient.GetContainer(databaseName, DataModels.CosmosDbPartitionedItem<ItemType>.ContainerName);
         }
 
         private static string FormatID(int id) => id.ToString("X");
@@ -119,9 +119,9 @@ namespace CurrencyMonitor.DataAccess
         /// <param name="item">Das zu speichernde Element.</param>
         public async Task AddItemAsync(ItemType item)
         {
-            item.Id = CosmosDbPartitionedItem<ItemType>.GenerateIdFor(item);
+            item.Id = DataModels.CosmosDbPartitionedItem<ItemType>.GenerateIdFor(item);
             await _container.CreateItemAsync(item,
-                new PartitionKey(CosmosDbPartitionedItem<ItemType>.GetPartitionKeyValue(item))
+                new PartitionKey(DataModels.CosmosDbPartitionedItem<ItemType>.GetPartitionKeyValue(item))
             );
         }
 
@@ -142,7 +142,7 @@ namespace CurrencyMonitor.DataAccess
         public async Task UpdateItemAsync(ItemType item)
         {
             await _container.UpsertItemAsync(item,
-                new PartitionKey(CosmosDbPartitionedItem<ItemType>.GetPartitionKeyValue(item))
+                new PartitionKey(DataModels.CosmosDbPartitionedItem<ItemType>.GetPartitionKeyValue(item))
             );
         }
 

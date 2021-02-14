@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 
-using CurrencyMonitor.DataModels;
-
 using Xunit;
 
-namespace CurrencyMonitor.DataAccess.UnitTests
+namespace CurrencyMonitor.DataModels.UnitTests
 {
     public class CosmosDbPartitionedItemTest
     {
