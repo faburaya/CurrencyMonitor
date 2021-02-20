@@ -13,13 +13,13 @@ namespace CurrencyMonitor.DataAccess
     {
         Task<IEnumerable<ItemType>> QueryAsync(Func<IOrderedQueryable<ItemType>, IQueryable<ItemType>> query);
 
-        Task<ItemType> GetItemAsync(string partitionKey, int id);
+        Task<ItemType> GetItemAsync(string partitionKey, string id);
 
         Task<int> GetItemCountAsync();
 
         Task AddItemAsync(ItemType item);
 
-        Task DeleteItemAsync(string partitionKey, int id);
+        Task DeleteItemAsync(string partitionKey, string id);
 
         Task UpdateItemAsync(ItemType item);
     }

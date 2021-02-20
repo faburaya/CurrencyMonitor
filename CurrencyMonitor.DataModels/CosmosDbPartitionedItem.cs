@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Reflection;
+
+using Newtonsoft.Json;
 
 namespace CurrencyMonitor.DataModels
 {
@@ -12,11 +12,6 @@ namespace CurrencyMonitor.DataModels
     /// </summary>
     public static class CosmosDbPartitionedItem<ItemType> where ItemType : class
     {
-        public static string SerializeToJson(ItemType item)
-        {
-            return JsonSerializer.Serialize(item);
-        }
-
         private static readonly PropertyInfo[] serializableProperties;
 
         /// <summary>
@@ -30,14 +25,17 @@ namespace CurrencyMonitor.DataModels
         /// gleiche Elemente in der selben Partition der Cosmos Datenbank zu speichern.
         /// </remarks>
         /// <returns>Die erstellte Identifikationsnummer.</returns>
-        public static int GenerateIdFor(ItemType item)
+        public static string GenerateIdFor(ItemType item)
         {
             int hashCode = 7;
             foreach (PropertyInfo property in serializableProperties)
             {
-                hashCode = 31 * hashCode + property.GetValue(item).GetHashCode();
+                if (property.Name != "Id")
+                {
+                    hashCode = 31 * hashCode + property.GetValue(item).GetHashCode();
+                }
             }
-            return hashCode;
+            return hashCode.ToString("X8");
         }
 
         private static readonly PropertyInfo partitionKeyProperty;
@@ -69,7 +67,7 @@ namespace CurrencyMonitor.DataModels
             ContainerName = containerAttribute.Name;
 
             serializableProperties = (from property in typeof(ItemType).GetProperties()
-                                      where property.GetCustomAttribute<JsonPropertyNameAttribute>() != null
+                                      where property.GetCustomAttribute<JsonPropertyAttribute>() != null
                                       select property).ToArray();
 
             IEnumerable<PropertyInfo> properties =
@@ -90,10 +88,10 @@ namespace CurrencyMonitor.DataModels
 
             partitionKeyProperty = properties.First();
 
-            var jsonSerialization = partitionKeyProperty.GetCustomAttribute<JsonPropertyNameAttribute>();
+            var jsonSerialization = partitionKeyProperty.GetCustomAttribute<JsonPropertyAttribute>();
             if (jsonSerialization != null)
             {
-                PartitionKeyPath = $"/{jsonSerialization.Name}";
+                PartitionKeyPath = $"/{jsonSerialization.PropertyName}";
                 return;
             }
 

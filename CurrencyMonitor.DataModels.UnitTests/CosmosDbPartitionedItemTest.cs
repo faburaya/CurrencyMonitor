@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Text.Json.Serialization;
 
+using Newtonsoft.Json;
 using Xunit;
 
 namespace CurrencyMonitor.DataModels.UnitTests
@@ -122,10 +122,10 @@ namespace CurrencyMonitor.DataModels.UnitTests
     internal class TestClassItem
     {
         [CosmosPartitionKey]
-        [JsonPropertyName("key")]
+        [JsonProperty("key")]
         public string Key { get; set; }
 
-        [JsonPropertyName("value")]
+        [JsonProperty("value")]
         public int Value { get; set; }
 
         public int IrrelevantForIdGeneration { get; set; }
@@ -138,7 +138,7 @@ namespace CurrencyMonitor.DataModels.UnitTests
     internal class TestClassItemNoContainer
     {
         [CosmosPartitionKey]
-        [JsonPropertyName("key")]
+        [JsonProperty("key")]
         public string Key { get; set; }
 
         public string Value { get; set; }
@@ -151,10 +151,10 @@ namespace CurrencyMonitor.DataModels.UnitTests
     [CosmosContainer(Name = "box")]
     internal class TestClassItemNoKey
     {
-        [JsonPropertyName("key")]
+        [JsonProperty("key")]
         public string Key { get; set; }
 
-        [JsonPropertyName("value")]
+        [JsonProperty("value")]
         public string Value { get; set; }
     }
 
@@ -168,7 +168,7 @@ namespace CurrencyMonitor.DataModels.UnitTests
         [CosmosPartitionKey]
         public string Key { get; set; }
 
-        [JsonPropertyName("value")]
+        [JsonProperty("value")]
         public string Value { get; set; }
     }
 
@@ -180,7 +180,7 @@ namespace CurrencyMonitor.DataModels.UnitTests
     internal class TestClassItemWithTwoKeys
     {
         [CosmosPartitionKey]
-        [JsonPropertyName("key")]
+        [JsonProperty("key")]
         public string Key { get; set; }
 
         [CosmosPartitionKey]

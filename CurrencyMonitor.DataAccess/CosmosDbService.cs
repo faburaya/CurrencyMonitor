@@ -42,8 +42,6 @@ namespace CurrencyMonitor.DataAccess
             _container = dbClient.GetContainer(databaseName, DataModels.CosmosDbPartitionedItem<ItemType>.ContainerName);
         }
 
-        private static string FormatID(int id) => id.ToString("X");
-
         /// <summary>
         /// Fragt die Datenbank ab.
         /// </summary>
@@ -71,12 +69,12 @@ namespace CurrencyMonitor.DataAccess
         /// </summary>
         /// <param name="partitionKey">Der Partitionsschlüssel.</param>
         /// <param name="id">Die Identifikation des Elements.</param>
-        public async Task<ItemType> GetItemAsync(string partitionKey, int id)
+        public async Task<ItemType> GetItemAsync(string partitionKey, string id)
         {
             try
             {
                 ItemResponse<ItemType> response =
-                    await _container.ReadItemAsync<ItemType>(FormatID(id), new PartitionKey(partitionKey));
+                    await _container.ReadItemAsync<ItemType>(id, new PartitionKey(partitionKey));
                 return response.Resource;
             }
             catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
@@ -130,9 +128,9 @@ namespace CurrencyMonitor.DataAccess
         /// </summary>
         /// <param name="partitionKey">Der Partitionsschlüssel.</param>
         /// <param name="id">Die Identifikation des Elements.</param>
-        public async Task DeleteItemAsync(string partitionKey, int id)
+        public async Task DeleteItemAsync(string partitionKey, string id)
         {
-            await _container.DeleteItemAsync<ItemType>(FormatID(id), new PartitionKey(partitionKey));
+            await _container.DeleteItemAsync<ItemType>(id, new PartitionKey(partitionKey));
         }
 
         /// <summary>
