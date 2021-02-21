@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Threading;
+using System.Threading.Tasks;
 
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Linq;
@@ -18,11 +18,32 @@ namespace CurrencyMonitor.DataAccess.IntegrationTests
 
         private string DatabaseName => "CurrencyMonitor.DataAccess.IntegrationTests";
 
+        /// <summary>
+        /// Gibt das Container der Cosmos Datenbank an.
+        /// (Vorausgesetzt, dass die Container und Datenbank vorhanden sind.)
+        /// </summary>
+        /// <returns>Ein Objekt für das Container der Cosmos Datenbank.</returns>
         private Container GetCosmosContainer()
         {
             var client = new CosmosClient(ConnectionString);
-            return client.GetContainer(DatabaseName,
+            Container container = client.GetContainer(DatabaseName,
                 DataModels.CosmosDbPartitionedItem<Item>.ContainerName);
+            Assert.NotNull(container);
+            return container;
+        }
+
+        /// <summary>
+        /// Macht alle Änderungen in Cosmos Datenbank rückgängig.
+        /// </summary>
+        private void ResetCosmos()
+        {
+            var client = new CosmosClient(ConnectionString);
+
+            Database database = client.GetDatabase(DatabaseName);
+            if (database != null)
+            {
+                database.DeleteAsync().Wait();
+            }
         }
 
         private CosmosDbService<Item> CreateService()
@@ -53,26 +74,40 @@ namespace CurrencyMonitor.DataAccess.IntegrationTests
         [Fact]
         public void InitializeCosmosClientInstance()
         {
-            CreateService();
+            try
+            {
+                CreateService();
+            }
+            finally
+            {
+                ResetCosmos();
+            }
         }
 
         [Fact]
         public void AddSingleItem()
         {
-            CosmosDbService<Item> service = CreateService();
-            var expectedItem = new Item { Name = "Werner", Family = "Heisenberg" };
-            service.AddItemAsync(expectedItem).Wait();
+            try
+            {
+                CosmosDbService<Item> service = CreateService();
+                var expectedItem = new Item { Name = "Werner", Family = "Heisenberg" };
+                service.AddItemAsync(expectedItem).Wait();
 
-            // Überprüfung:
-            var container = GetCosmosContainer();
-            var actualItem = CollectResultsFromCosmos(
-                container.GetItemLinqQueryable<Item>()
-                    .Where(item => item.Name == expectedItem.Name && item.Family == expectedItem.Family)
-                    .Select(item => item)
-                ).FirstOrDefault();
+                // Überprüfung:
+                var container = GetCosmosContainer();
+                var actualItem = CollectResultsFromCosmos(
+                    container.GetItemLinqQueryable<Item>()
+                        .Where(item => item.Name == expectedItem.Name && item.Family == expectedItem.Family)
+                        .Select(item => item)
+                    ).FirstOrDefault();
 
-            Assert.NotNull(actualItem);
-            Assert.False(string.IsNullOrEmpty(actualItem.Id));
+                Assert.NotNull(actualItem);
+                Assert.False(string.IsNullOrEmpty(actualItem.Id));
+            }
+            finally
+            {
+                ResetCosmos();
+            }
         }
 
     }// end of class CosmosDbServiceTest
