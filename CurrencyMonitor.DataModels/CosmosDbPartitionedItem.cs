@@ -14,15 +14,23 @@ namespace CurrencyMonitor.DataModels
     {
         private static readonly PropertyInfo[] serializableProperties;
 
+        private static readonly Random _randomGenerator = new Random();
+
         /// <summary>
-        /// Erstellt ein ID-Nummer für das enthaltede Element.
+        /// Erstellt ein ID-Nummer für das gegebene Element.
         /// </summary>
-        /// <remarks>
-        /// Die Nummer ist eingentlich ein Hash-Code, das berechnet wird, sodass nur die
-        /// JSON-serialisierbaren Properties berücksichtigt werden.
-        /// </remarks>
         /// <returns>Die erstellte Identifikationsnummer.</returns>
         public static string GenerateIdFor(ItemType item)
+        {
+            int hash = CalculateHashOfJsonFor(item);
+            return (_randomGenerator.Next() ^ hash).ToString("X8");
+        }
+
+        /// <summary>
+        /// Gibt ein Hash-Code zurück, das berechnet wird, sodass nur die
+        /// JSON-serialisierbaren Properties berücksichtigt werden.
+        /// </summary>
+        public static int CalculateHashOfJsonFor(ItemType item)
         {
             int hashCode = 7;
             foreach (PropertyInfo property in serializableProperties)
@@ -33,7 +41,7 @@ namespace CurrencyMonitor.DataModels
                     hashCode = 31 * hashCode + (boxedValue != null ? boxedValue.GetHashCode() : 0);
                 }
             }
-            return hashCode.ToString("X8");
+            return hashCode;
         }
 
         private static readonly PropertyInfo partitionKeyProperty;
@@ -71,8 +79,7 @@ namespace CurrencyMonitor.DataModels
             IEnumerable<PropertyInfo> properties =
                 from property in typeof(ItemType).GetProperties()
                 where property.GetCustomAttribute<CosmosPartitionKeyAttribute>() != null
-                select property
-            ;
+                select property;
 
             if (!properties.Any())
             {

@@ -117,6 +117,7 @@ namespace CurrencyMonitor.DataAccess
         /// <param name="item">Das zu speichernde Element.</param>
         public async Task AddItemAsync(ItemType item)
         {
+            item = item.ShallowCopy<ItemType>();
             item.Id = DataModels.CosmosDbPartitionedItem<ItemType>.GenerateIdFor(item);
             await _container.CreateItemAsync(item,
                 new PartitionKey(DataModels.CosmosDbPartitionedItem<ItemType>.GetPartitionKeyValue(item))

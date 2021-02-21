@@ -2,9 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Microsoft.Azure.Cosmos;
-using Microsoft.Azure.Cosmos.Linq;
-
 using Xunit;
 
 namespace CurrencyMonitor.DataAccess.IntegrationTests
@@ -44,9 +41,21 @@ namespace CurrencyMonitor.DataAccess.IntegrationTests
                 new TestItem { Name = "Werner", Family = "Heisenberg" },
                 new TestItem { Name = "Katze", Family = "Schrödinger" }
             };
+            AddMultipleItems(expectedItems);
+        }
 
+        [Fact]
+        public void AddEquivalentItems()
+        {
+            var item = new TestItem { Name = "Andressa", Family = "Rabah" };
+            var expectedItems = new List<TestItem> { item, item };
+            AddMultipleItems(expectedItems);
+        }
+
+        private void AddMultipleItems(IList<TestItem> expectedItems)
+        {
             var tasks = new Task[expectedItems.Count];
-            for (int idx = 0; idx < expectedItems.Count; ++idx)
+            for (int idx = 0; idx < tasks.Length; ++idx)
             {
                 tasks[idx] = Fixture.Service.AddItemAsync(expectedItems[idx]);
             }
@@ -65,6 +74,8 @@ namespace CurrencyMonitor.DataAccess.IntegrationTests
                             && actualItem.Family == expectedItem.Family;
                     });
             }
+
+            Assert.All(results, item => Assert.False(string.IsNullOrEmpty(item.Id)));
         }
 
     }// end of class CosmosDbServiceTest

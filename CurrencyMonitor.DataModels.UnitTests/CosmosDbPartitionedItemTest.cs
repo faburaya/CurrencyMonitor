@@ -58,59 +58,81 @@ namespace CurrencyMonitor.DataModels.UnitTests
         }
 
         [Fact]
-        public void CreateIdFor_WhenItemsEqual_ThenSameId()
+        public void GenerateIdFor_WhenItemsEqual_ThenDifferentId()
         {
             var obj1 = new TestClassItem { Key = "Schlüssel", Value = 32 };
             var obj2 = new TestClassItem { Key = "Schlüssel", Value = 32 };
 
-            Assert.Equal(
+            Assert.NotEqual(
+                CosmosDbPartitionedItem<TestClassItem>.GenerateIdFor(obj1),
+                CosmosDbPartitionedItem<TestClassItem>.GenerateIdFor(obj2)
+            );
+
+            Assert.NotEqual(
                 CosmosDbPartitionedItem<TestClassItem>.GenerateIdFor(obj1),
                 CosmosDbPartitionedItem<TestClassItem>.GenerateIdFor(obj1)
             );
 
-            Assert.Equal(
+            Assert.NotEqual(
                 CosmosDbPartitionedItem<TestClassItem>.GenerateIdFor(obj2),
-                CosmosDbPartitionedItem<TestClassItem>.GenerateIdFor(obj2)
-            );
-
-            Assert.Equal(
-                CosmosDbPartitionedItem<TestClassItem>.GenerateIdFor(obj1),
                 CosmosDbPartitionedItem<TestClassItem>.GenerateIdFor(obj2)
             );
         }
 
         [Fact]
-        public void CreateIdFor_WhenItemsDifferent_ThenDifferentId()
+        public void CalculateHashOfJsonFor_WhenItemsEqual_ThenSameHash()
+        {
+            var obj1 = new TestClassItem { Key = "Schlüssel", Value = 32 };
+            var obj2 = new TestClassItem { Key = "Schlüssel", Value = 32 };
+
+            Assert.Equal(
+                CosmosDbPartitionedItem<TestClassItem>.CalculateHashOfJsonFor(obj1),
+                CosmosDbPartitionedItem<TestClassItem>.CalculateHashOfJsonFor(obj1)
+            );
+
+            Assert.Equal(
+                CosmosDbPartitionedItem<TestClassItem>.CalculateHashOfJsonFor(obj2),
+                CosmosDbPartitionedItem<TestClassItem>.CalculateHashOfJsonFor(obj2)
+            );
+
+            Assert.Equal(
+                CosmosDbPartitionedItem<TestClassItem>.CalculateHashOfJsonFor(obj1),
+                CosmosDbPartitionedItem<TestClassItem>.CalculateHashOfJsonFor(obj2)
+            );
+        }
+
+        [Fact]
+        public void CalculateHashOfJsonFor_WhenItemsDifferent_ThenDifferentHash()
         {
             var obj1 = new TestClassItem { Key = "Schlüssel", Value = 32 };
             var obj2 = new TestClassItem { Key = "Schlüssel", Value = 1 };
             var obj3 = new TestClassItem { Key = "Tür", Value = 32 };
 
             Assert.NotEqual(
-                CosmosDbPartitionedItem<TestClassItem>.GenerateIdFor(obj1),
-                CosmosDbPartitionedItem<TestClassItem>.GenerateIdFor(obj2)
+                CosmosDbPartitionedItem<TestClassItem>.CalculateHashOfJsonFor(obj1),
+                CosmosDbPartitionedItem<TestClassItem>.CalculateHashOfJsonFor(obj2)
             );
 
             Assert.NotEqual(
-                CosmosDbPartitionedItem<TestClassItem>.GenerateIdFor(obj1),
-                CosmosDbPartitionedItem<TestClassItem>.GenerateIdFor(obj3)
+                CosmosDbPartitionedItem<TestClassItem>.CalculateHashOfJsonFor(obj1),
+                CosmosDbPartitionedItem<TestClassItem>.CalculateHashOfJsonFor(obj3)
             );
 
             Assert.NotEqual(
-                CosmosDbPartitionedItem<TestClassItem>.GenerateIdFor(obj2),
-                CosmosDbPartitionedItem<TestClassItem>.GenerateIdFor(obj3)
+                CosmosDbPartitionedItem<TestClassItem>.CalculateHashOfJsonFor(obj2),
+                CosmosDbPartitionedItem<TestClassItem>.CalculateHashOfJsonFor(obj3)
             );
         }
 
         [Fact]
-        public void CreateIdFor_WhenDifferenceIrrelevant_ThenSameId()
+        public void CalculateHashOfJsonFor_WhenDifferenceIrrelevant_ThenSameHash()
         {
-            var obj1 = new TestClassItem { Key = "Schlüssel", Value = 32, IrrelevantForIdGeneration = 1 };
-            var obj2 = new TestClassItem { Key = "Schlüssel", Value = 32, IrrelevantForIdGeneration = 100 };
+            var obj1 = new TestClassItem { Key = "Schlüssel", Value = 32, IrrelevantForHashCalculation = 1 };
+            var obj2 = new TestClassItem { Key = "Schlüssel", Value = 32, IrrelevantForHashCalculation = 100 };
 
             Assert.Equal(
-                CosmosDbPartitionedItem<TestClassItem>.GenerateIdFor(obj1),
-                CosmosDbPartitionedItem<TestClassItem>.GenerateIdFor(obj2)
+                CosmosDbPartitionedItem<TestClassItem>.CalculateHashOfJsonFor(obj1),
+                CosmosDbPartitionedItem<TestClassItem>.CalculateHashOfJsonFor(obj2)
             );
         }
     }
@@ -128,7 +150,7 @@ namespace CurrencyMonitor.DataModels.UnitTests
         [JsonProperty("value")]
         public int Value { get; set; }
 
-        public int IrrelevantForIdGeneration { get; set; }
+        public int IrrelevantForHashCalculation { get; set; }
     }
 
     /// <summary>

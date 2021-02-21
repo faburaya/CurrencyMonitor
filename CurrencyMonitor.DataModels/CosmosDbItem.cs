@@ -15,5 +15,10 @@ namespace CurrencyMonitor.DataModels
         public string Id { get; set; }
 
         public abstract string PartitionKeyValue { get; }
+
+        public virtual ToType ShallowCopy<ToType>()
+        {
+            return (ToType)this.MemberwiseClone();
+        }
     }
 }
