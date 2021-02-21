@@ -19,10 +19,7 @@ namespace CurrencyMonitor.DataModels
         /// </summary>
         /// <remarks>
         /// Die Nummer ist eingentlich ein Hash-Code, das berechnet wird, sodass nur die
-        /// JSON-serialisierbaren Properties berücksichtigt werden. Auf diese Weise sind
-        /// die ID-Nummern von zwei Elementen gleich, wenn deren JSON-Serialisierung gleich
-        /// sind. Das heißt: diese ID-Nummern absichtlich zusammenstoßen, wenn man versucht,
-        /// gleiche Elemente in der selben Partition der Cosmos Datenbank zu speichern.
+        /// JSON-serialisierbaren Properties berücksichtigt werden.
         /// </remarks>
         /// <returns>Die erstellte Identifikationsnummer.</returns>
         public static string GenerateIdFor(ItemType item)
@@ -32,7 +29,8 @@ namespace CurrencyMonitor.DataModels
             {
                 if (property.Name != "Id")
                 {
-                    hashCode = 31 * hashCode + property.GetValue(item).GetHashCode();
+                    object boxedValue = property.GetValue(item);
+                    hashCode = 31 * hashCode + (boxedValue != null ? boxedValue.GetHashCode() : 0);
                 }
             }
             return hashCode.ToString("X8");
