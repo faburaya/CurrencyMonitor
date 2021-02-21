@@ -16,7 +16,7 @@ namespace CurrencyMonitor.DataAccess.IntegrationTests
         }
 
         [Fact]
-        public void AddSingleItem()
+        public void AddItem_WhenSingle()
         {
             var expectedItem = new TestItem { Name = "Werner", Family = "Heisenberg" };
             Fixture.Service.AddItemAsync(expectedItem).Wait();
@@ -35,24 +35,24 @@ namespace CurrencyMonitor.DataAccess.IntegrationTests
         }
 
         [Fact]
-        public void AddDistinctItems()
+        public void AddItem_WhenDistinct()
         {
             var expectedItems = new List<TestItem> {
                 new TestItem { Name = "Werner", Family = "Heisenberg" },
                 new TestItem { Name = "Katze", Family = "Schrödinger" }
             };
-            AddMultipleItems(expectedItems);
+            TestAddMultipleItems(expectedItems);
         }
 
         [Fact]
-        public void AddEquivalentItems()
+        public void AddItem_WhenEquivalent()
         {
             var item = new TestItem { Name = "Andressa", Family = "Rabah" };
             var expectedItems = new List<TestItem> { item, item };
-            AddMultipleItems(expectedItems);
+            TestAddMultipleItems(expectedItems);
         }
 
-        private void AddMultipleItems(IList<TestItem> expectedItems)
+        private void TestAddMultipleItems(IList<TestItem> expectedItems)
         {
             var tasks = new Task[expectedItems.Count];
             for (int idx = 0; idx < tasks.Length; ++idx)

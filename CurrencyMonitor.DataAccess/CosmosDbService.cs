@@ -119,9 +119,7 @@ namespace CurrencyMonitor.DataAccess
         {
             item = item.ShallowCopy<ItemType>();
             item.Id = DataModels.CosmosDbPartitionedItem<ItemType>.GenerateIdFor(item);
-            await _container.CreateItemAsync(item,
-                new PartitionKey(DataModels.CosmosDbPartitionedItem<ItemType>.GetPartitionKeyValue(item))
-            );
+            await _container.CreateItemAsync(item, new PartitionKey(item.PartitionKeyValue));
         }
 
         /// <summary>
@@ -140,9 +138,7 @@ namespace CurrencyMonitor.DataAccess
         /// <param name="item">Das zu ändernde Element.</param>
         public async Task UpdateItemAsync(ItemType item)
         {
-            await _container.UpsertItemAsync(item,
-                new PartitionKey(DataModels.CosmosDbPartitionedItem<ItemType>.GetPartitionKeyValue(item))
-            );
+            await _container.UpsertItemAsync(item, new PartitionKey(item.PartitionKeyValue));
         }
 
     }// end of class CosmosDbService
