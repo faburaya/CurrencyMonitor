@@ -1,0 +1,24 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+using Newtonsoft.Json;
+
+namespace CurrencyMonitor.DataAccess.IntegrationTests
+{
+    /// <summary>
+    /// Dieser Type sollte als Element der Datenbank gut funktionieren.
+    /// </summary>
+    [DataModels.CosmosContainer(Name = "CosmosDbServiceTest.TestItem")]
+    public class TestItem : DataModels.CosmosDbItem
+    {
+        [Required]
+        [JsonProperty(PropertyName = "name")]
+        public string Name { get; set; }
+
+        public override string PartitionKeyValue => Family;
+
+        [Required]
+        [DataModels.CosmosPartitionKey]
+        [JsonProperty(PropertyName = "family")]
+        public string Family { get; set; }
+    }
+}
