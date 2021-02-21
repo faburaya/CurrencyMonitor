@@ -18,27 +18,6 @@ namespace CurrencyMonitor.DataAccess.IntegrationTests
             this.Fixture = fixture;
         }
 
-        private IEnumerable<TestItem> CollectResultsFromCosmos(IQueryable<TestItem> query)
-        {
-            using FeedIterator<TestItem> iterator = query.ToFeedIterator<TestItem>();
-
-            var results = new List<TestItem>();
-            while (iterator.HasMoreResults)
-            {
-                FeedResponse<TestItem> response = iterator.ReadNextAsync().Result;
-                results.AddRange(response);
-            }
-
-            return results;
-        }
-
-        private IEnumerable<TestItem> GetAllItemsDirectlyFromCosmos()
-        {
-            var container = Fixture.GetCosmosContainer();
-            return CollectResultsFromCosmos(
-                container.GetItemLinqQueryable<TestItem>().Select(item => item));
-        }
-
         [Fact]
         public void AddSingleItem()
         {
@@ -46,11 +25,11 @@ namespace CurrencyMonitor.DataAccess.IntegrationTests
             Fixture.Service.AddItemAsync(expectedItem).Wait();
 
             // Überprüfung:
-            var container = Fixture.GetCosmosContainer();
-            var results = CollectResultsFromCosmos(
-                container.GetItemLinqQueryable<TestItem>()
-                    .Where(item => item.Name == expectedItem.Name && item.Family == expectedItem.Family)
-                    .Select(item => item));
+            using var cosmosDataAccess = Fixture.GetAccessToCosmosContainerData();
+            var results = cosmosDataAccess.CollectResultsFromQuery(source =>
+                source.Where(item => item.Name == expectedItem.Name
+                    && item.Family == expectedItem.Family)
+                .Select(item => item));
 
             Assert.Single(results);
             TestItem actualItem = results.First();
@@ -74,7 +53,8 @@ namespace CurrencyMonitor.DataAccess.IntegrationTests
             Task.WaitAll(tasks);
 
             // Überprüfung:
-            var results = GetAllItemsDirectlyFromCosmos();
+            using var cosmosDataAccess = Fixture.GetAccessToCosmosContainerData();
+            var results = cosmosDataAccess.CollectResultsFromQuery(source => source.Select(item => item));
             Assert.Equal(expectedItems.Count, results.Count());
 
             foreach (TestItem expectedItem in expectedItems)

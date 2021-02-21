@@ -16,6 +16,20 @@ namespace CurrencyMonitor.DataAccess.IntegrationTests
 
         public CosmosDbService<TestItem> Service { get; }
 
+        /// <summary>
+        /// Gewährt Zugang auf die Daten im Cosmos Container.
+        /// </summary>
+        /// <remarks>
+        /// Es geht davon aus, dass das Container und die Datenbank vorhanden sind.
+        /// </remarks>
+        public ContainerDataAutoReset GetAccessToCosmosContainerData()
+        {
+            Container container = Client.GetContainer(DatabaseName,
+                DataModels.CosmosDbPartitionedItem<TestItem>.ContainerName);
+            Assert.NotNull(container);
+            return new ContainerDataAutoReset(container);
+        }
+
         public CosmosDatabaseFixture()
         {
             this.Client = new CosmosClient(ConnectionString);
@@ -39,7 +53,7 @@ namespace CurrencyMonitor.DataAccess.IntegrationTests
 
         private bool _disposed = false;
 
-        public virtual void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (_disposed)
                 return;
@@ -54,19 +68,6 @@ namespace CurrencyMonitor.DataAccess.IntegrationTests
             }
 
             _disposed = true;
-        }
-
-        /// <summary>
-        /// Gibt das Container der Cosmos Datenbank an.
-        /// (Vorausgesetzt, dass die Container und Datenbank vorhanden sind.)
-        /// </summary>
-        /// <returns>Ein Objekt für das Container der Cosmos Datenbank.</returns>
-        public Container GetCosmosContainer()
-        {
-            Container container = Client.GetContainer(DatabaseName,
-                DataModels.CosmosDbPartitionedItem<TestItem>.ContainerName);
-            Assert.NotNull(container);
-            return container;
         }
 
     }// end of class CosmosDatabaseFixture
