@@ -28,20 +28,38 @@ namespace CurrencyMonitor.DataAccess.IntegrationTests
         /// </summary>
         /// <param name="query">Die zu laufende LINQ-Abfrage.</param>
         /// <returns>Die Ergebnisse der Abfrage.</returns>
-        public IEnumerable<TestItem> CollectResultsFromQuery(QueryCosmos query)
+        public IList<TestItem> CollectResultsFromQuery(QueryCosmos query)
         {
-            using var iterator =
+            using FeedIterator<TestItem> iterator =
                 query(Container.GetItemLinqQueryable<TestItem>())
                 .ToFeedIterator();
 
             var results = new List<TestItem>();
             while (iterator.HasMoreResults)
             {
-                var response = iterator.ReadNextAsync().Result;
+                FeedResponse<TestItem> response = iterator.ReadNextAsync().Result;
                 results.AddRange(response);
             }
 
             return results;
+        }
+
+        /// <summary>
+        /// Fügt dem Container neue Elemente hinzu.
+        /// </summary>
+        /// <param name="items">Die hinzuzufügenden Elemente.</param>
+        public void AddToContainer(IList<TestItem> items)
+        {
+            var randomizer = new Random();
+
+            var tasks = new Task[items.Count];
+            for (int idx = 0; idx < tasks.Length; ++idx)
+            {
+                TestItem item = items[idx];
+                item.Id = randomizer.Next().ToString("X8");
+                tasks[idx] = Container.CreateItemAsync(item, new PartitionKey(item.PartitionKeyValue));
+            }
+            Task.WaitAll(tasks);
         }
 
         private void EraseAllItemsInContainer()

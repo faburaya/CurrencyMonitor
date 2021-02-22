@@ -16,6 +16,17 @@ namespace CurrencyMonitor.DataModels
 
         public abstract string PartitionKeyValue { get; }
 
+        public virtual bool IsEquivalentInStorageTo<Type>(Type other) where Type : CosmosDbItem
+        {
+            return CosmosDbPartitionedItem<Type>.CalculateHashOfJsonFor((Type)this)
+                == CosmosDbPartitionedItem<Type>.CalculateHashOfJsonFor(other);
+        }
+
+        public override string ToString()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
+
         public virtual ToType ShallowCopy<ToType>()
         {
             return (ToType)this.MemberwiseClone();

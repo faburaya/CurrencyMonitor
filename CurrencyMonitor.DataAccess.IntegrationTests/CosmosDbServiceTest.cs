@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -39,7 +40,7 @@ namespace CurrencyMonitor.DataAccess.IntegrationTests
         {
             var expectedItems = new List<TestItem> {
                 new TestItem { Name = "Werner", Family = "Heisenberg" },
-                new TestItem { Name = "Katze", Family = "Schrödinger" }
+                new TestItem { Name = "Katze", Family = "Schrödinger" },
             };
             TestAddMultipleItems(expectedItems);
         }
@@ -76,6 +77,36 @@ namespace CurrencyMonitor.DataAccess.IntegrationTests
             }
 
             Assert.All(results, item => Assert.False(string.IsNullOrEmpty(item.Id)));
+        }
+
+        [Fact]
+        public void DeleteItem_WhenPresent()
+        {
+            using var cosmosDataAccess = Fixture.GetAccessToCosmosContainerData();
+
+            var someItems = new List<TestItem> {
+                new TestItem { Name = "Paloma", Family = "Farah" },
+                new TestItem { Name = "Andressa", Family = "Rabah" },
+            };
+            cosmosDataAccess.AddToContainer(someItems);
+
+            var itemsBeforeDeletion = cosmosDataAccess.CollectResultsFromQuery(source => source.Select(item => item));
+            if (itemsBeforeDeletion.Count != someItems.Count)
+            {
+                throw new Exception($"Es ist der Vorbereitung des Testszenarios nicht gelungen, dem Container einige Elemente hinzuzufügen! (Nur {itemsBeforeDeletion.Count} Elemente statt {itemsBeforeDeletion.Count} sind dort gespeichert.)");
+            }
+
+            Task.WaitAll((from item in itemsBeforeDeletion 
+                          select Fixture.Service.DeleteItemAsync(item.PartitionKeyValue, item.Id))
+                          .ToArray());
+
+            var itemsAfterDeletion = cosmosDataAccess.CollectResultsFromQuery(source => source.Select(item => item));
+            foreach (TestItem item in itemsBeforeDeletion)
+            {
+                Assert.DoesNotContain(itemsAfterDeletion,
+                    remainingItem => item.IsEquivalentInStorageTo(remainingItem));
+            }
+            Assert.Empty(itemsAfterDeletion);
         }
 
     }// end of class CosmosDbServiceTest
