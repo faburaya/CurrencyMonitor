@@ -35,11 +35,8 @@ namespace CurrencyMonitor.DataModels
             int hashCode = 7;
             foreach (PropertyInfo property in serializableProperties)
             {
-                if (property.Name != "Id")
-                {
-                    object boxedValue = property.GetValue(item);
-                    hashCode = 31 * hashCode + (boxedValue != null ? boxedValue.GetHashCode() : 0);
-                }
+                object boxedValue = property.GetValue(item);
+                hashCode = 31 * hashCode + (boxedValue != null ? boxedValue.GetHashCode() : 0);
             }
             return hashCode;
         }

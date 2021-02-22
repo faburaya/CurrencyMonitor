@@ -14,7 +14,8 @@ namespace CurrencyMonitor.DataAccess.IntegrationTests
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
 
-        public override string PartitionKeyValue => Family;
+        public override string PartitionKeyValue
+            => DataModels.CosmosDbPartitionedItem<TestItem>.GetPartitionKeyValue(this);
 
         [Required]
         [DataModels.CosmosPartitionKey]

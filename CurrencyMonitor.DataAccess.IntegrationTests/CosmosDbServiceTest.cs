@@ -55,12 +55,9 @@ namespace CurrencyMonitor.DataAccess.IntegrationTests
 
         private void TestAddMultipleItems(IList<TestItem> expectedItems)
         {
-            var tasks = new Task[expectedItems.Count];
-            for (int idx = 0; idx < tasks.Length; ++idx)
-            {
-                tasks[idx] = Fixture.Service.AddItemAsync(expectedItems[idx]);
-            }
-            Task.WaitAll(tasks);
+            Task.WaitAll((from item in expectedItems
+                          select Fixture.Service.AddItemAsync(item))
+                          .ToArray());
 
             // Überprüfung:
             using var cosmosDataAccess = Fixture.GetAccessToCosmosContainerData();
@@ -90,7 +87,9 @@ namespace CurrencyMonitor.DataAccess.IntegrationTests
             };
             cosmosDataAccess.AddToContainer(someItems);
 
-            var itemsBeforeDeletion = cosmosDataAccess.CollectResultsFromQuery(source => source.Select(item => item));
+            var itemsBeforeDeletion =
+                cosmosDataAccess.CollectResultsFromQuery(source => source.Select(item => item));
+
             if (itemsBeforeDeletion.Count != someItems.Count)
             {
                 throw new Exception($"Es ist der Vorbereitung des Testszenarios nicht gelungen, dem Container einige Elemente hinzuzufügen! (Nur {itemsBeforeDeletion.Count} Elemente statt {itemsBeforeDeletion.Count} sind dort gespeichert.)");
@@ -100,7 +99,9 @@ namespace CurrencyMonitor.DataAccess.IntegrationTests
                           select Fixture.Service.DeleteItemAsync(item.PartitionKeyValue, item.Id))
                           .ToArray());
 
-            var itemsAfterDeletion = cosmosDataAccess.CollectResultsFromQuery(source => source.Select(item => item));
+            var itemsAfterDeletion =
+                cosmosDataAccess.CollectResultsFromQuery(source => source.Select(item => item));
+
             foreach (TestItem item in itemsBeforeDeletion)
             {
                 Assert.DoesNotContain(itemsAfterDeletion,
