@@ -67,7 +67,8 @@ namespace CurrencyMonitor.DataAccess.IntegrationTests
             foreach (TestItem expectedItem in expectedItems)
             {
                 Assert.Contains(results,
-                    actualItem => {
+                    actualItem =>
+                    {
                         return actualItem.Name == expectedItem.Name
                             && actualItem.Family == expectedItem.Family;
                     });
@@ -102,7 +103,7 @@ namespace CurrencyMonitor.DataAccess.IntegrationTests
                 new TestItem { Name = "Andressa", Family = "Rabah" },
             }, cosmosDataAccess);
 
-            Task.WaitAll((from item in itemsBeforeDeletion 
+            Task.WaitAll((from item in itemsBeforeDeletion
                           select Fixture.Service.DeleteItemAsync(item.PartitionKeyValue, item.Id))
                           .ToArray());
 
@@ -165,6 +166,48 @@ namespace CurrencyMonitor.DataAccess.IntegrationTests
             }, cosmosDataAccess);
 
             Assert.Equal(addedItems.Count(), Fixture.Service.GetItemCountAsync().Result);
+        }
+
+        [Fact]
+        public void GetItem_WhenNotPresent_ReturnNull()
+        {
+            using var cosmosDataAccess = Fixture.GetAccessToCosmosContainerData();
+
+            Assert.Null(Fixture.Service.GetItemAsync("nicht", "vorhanden").Result);
+
+            var availableItems = AddAndRetrieveItems(new List<TestItem> {
+                new TestItem { Name = "Paloma", Family = "Farah" },
+                new TestItem { Name = "Andressa", Family = "Rabah" },
+            }, cosmosDataAccess);
+
+            Assert.Null(Fixture.Service.GetItemAsync("nicht", "vorhanden").Result);
+        }
+
+        [Fact]
+        public void GetItem_WhenPresent_ReturnIt()
+        {
+            using var cosmosDataAccess = Fixture.GetAccessToCosmosContainerData();
+
+            var addedItems = AddAndRetrieveItems(new List<TestItem> {
+                new TestItem { Name = "Paloma", Family = "Farah" },
+                new TestItem { Name = "Andressa", Family = "Rabah" },
+            }, cosmosDataAccess);
+
+            var getItemRequests = (from item in addedItems
+                                   select new {
+                                       expectedItem = item,
+                                       promise = Fixture.Service.GetItemAsync(item.PartitionKeyValue, item.Id)
+                                   }).ToArray();
+
+            var results = (from request in getItemRequests
+                           select new {
+                               expectedItem = request.expectedItem,
+                               actualItem = request.promise.Result
+                           });
+
+            Assert.All(results,
+                x => Assert.True(x.actualItem.IsEquivalentInStorageTo(x.expectedItem))
+            );
         }
 
     }// end of class CosmosDbServiceTest
