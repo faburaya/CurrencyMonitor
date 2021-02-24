@@ -48,11 +48,11 @@ namespace CurrencyMonitor.DataAccess.IntegrationTests
         /// Fügt dem Container neue Elemente hinzu.
         /// </summary>
         /// <param name="items">Die hinzuzufügenden Elemente.</param>
-        public void AddToContainer(IList<TestItem> items)
+        public IEnumerable<TestItem> AddToContainer(IList<TestItem> items)
         {
             var randomizer = new Random();
 
-            var tasks = new Task[items.Count];
+            var tasks = new Task<ItemResponse<TestItem>>[items.Count];
             for (int idx = 0; idx < tasks.Length; ++idx)
             {
                 TestItem item = items[idx];
@@ -60,6 +60,8 @@ namespace CurrencyMonitor.DataAccess.IntegrationTests
                 tasks[idx] = Container.CreateItemAsync(item, new PartitionKey(item.PartitionKeyValue));
             }
             Task.WaitAll(tasks);
+
+            return (from task in tasks select task.Result.Resource);
         }
 
         private void EraseAllItemsInContainer()

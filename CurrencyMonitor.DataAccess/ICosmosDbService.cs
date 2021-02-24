@@ -17,7 +17,7 @@ namespace CurrencyMonitor.DataAccess
 
         Task<int> GetItemCountAsync();
 
-        Task AddItemAsync(ItemType item);
+        Task<ItemType> AddItemAsync(ItemType item);
 
         Task DeleteItemAsync(string partitionKey, string id);
 

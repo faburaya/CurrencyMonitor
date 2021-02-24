@@ -24,15 +24,14 @@ namespace CurrencyMonitor.DataAccess.IntegrationTests
 
             // Überprüfung:
             using var cosmosDataAccess = Fixture.GetAccessToCosmosContainerData();
-            var results = cosmosDataAccess.CollectResultsFromQuery(source =>
-                source.Where(item => item.Name == expectedItem.Name
-                    && item.Family == expectedItem.Family)
-                .Select(item => item));
+            var results = cosmosDataAccess.CollectResultsFromQuery(source => source.Select(item => item));
 
             Assert.Single(results);
             TestItem actualItem = results.First();
             Assert.NotNull(actualItem);
             Assert.False(string.IsNullOrEmpty(actualItem.Id));
+            Assert.True(actualItem.Name == expectedItem.Name);
+            Assert.True(actualItem.Family == expectedItem.Family);
         }
 
         [Fact]
@@ -55,39 +54,39 @@ namespace CurrencyMonitor.DataAccess.IntegrationTests
 
         private void TestAddMultipleItems(IList<TestItem> expectedItems)
         {
-            Task.WaitAll((from item in expectedItems
-                          select Fixture.Service.AddItemAsync(item))
-                          .ToArray());
+            var tasks = (from item in expectedItems select Fixture.Service.AddItemAsync(item)).ToArray();
+            Task.WaitAll(tasks);
 
             // Überprüfung:
             using var cosmosDataAccess = Fixture.GetAccessToCosmosContainerData();
-            var results = cosmosDataAccess.CollectResultsFromQuery(source => source.Select(item => item));
-            Assert.Equal(expectedItems.Count, results.Count());
+            var storedItems = cosmosDataAccess.CollectResultsFromQuery(source => source.Select(item => item));
+            Assert.Equal(expectedItems.Count, storedItems.Count());
+            Assert.All(storedItems, item => Assert.False(string.IsNullOrEmpty(item.Id)));
 
             foreach (TestItem expectedItem in expectedItems)
             {
-                Assert.Contains(results,
-                    actualItem =>
-                    {
+                Assert.Contains(storedItems,
+                    actualItem => {
                         return actualItem.Name == expectedItem.Name
                             && actualItem.Family == expectedItem.Family;
                     });
             }
 
-            Assert.All(results, item => Assert.False(string.IsNullOrEmpty(item.Id)));
+            var returnedItems = (from task in tasks select task.Result);
+            Assert.Equal(
+                returnedItems,
+                storedItems,
+                new DataModels.CosmosStoredItemComparer<TestItem>());
         }
 
         private IEnumerable<TestItem> AddAndRetrieveItems(
             IList<TestItem> items, ContainerDataAutoReset cosmosDataAccess)
         {
-            cosmosDataAccess.AddToContainer(items);
+            var itemsAddedToContainer = cosmosDataAccess.AddToContainer(items);
 
-            var itemsAddedToContainer =
-                cosmosDataAccess.CollectResultsFromQuery(source => source.Select(item => item));
-
-            if (itemsAddedToContainer.Count != items.Count)
+            if (itemsAddedToContainer.Count() != items.Count)
             {
-                throw new Exception($"Es ist der Vorbereitung des Testszenarios nicht gelungen, dem Container einige Elemente hinzuzufügen! (Nur {itemsAddedToContainer.Count} Elemente statt {items.Count} sind dort gespeichert.)");
+                throw new Exception($"Es ist der Vorbereitung des Testszenarios nicht gelungen, dem Container einige Elemente hinzuzufügen! (Nur {itemsAddedToContainer.Count()} Elemente statt {items.Count} sind dort gespeichert.)");
             }
 
             return itemsAddedToContainer;
@@ -199,13 +198,11 @@ namespace CurrencyMonitor.DataAccess.IntegrationTests
                                        promise = Fixture.Service.GetItemAsync(item.PartitionKeyValue, item.Id)
                                    }).ToArray();
 
-            var results = (from request in getItemRequests
-                           select new {
-                               expectedItem = request.expectedItem,
-                               actualItem = request.promise.Result
-                           });
-
-            Assert.All(results,
+            Assert.All(from request in getItemRequests
+                       select new {
+                           expectedItem = request.expectedItem,
+                           actualItem = request.promise.Result
+                       },
                 x => Assert.True(x.actualItem.IsEquivalentInStorageTo(x.expectedItem))
             );
         }

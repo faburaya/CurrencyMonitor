@@ -115,11 +115,12 @@ namespace CurrencyMonitor.DataAccess
         /// Fügt ein neues Element in der Datenbank hinzu.
         /// </summary>
         /// <param name="item">Das zu speichernde Element.</param>
-        public async Task AddItemAsync(ItemType item)
+        public async Task<ItemType> AddItemAsync(ItemType item)
         {
             item = item.ShallowCopy<ItemType>();
             item.Id = DataModels.CosmosDbPartitionedItem<ItemType>.GenerateIdFor(item);
-            await _container.CreateItemAsync(item, new PartitionKey(item.PartitionKeyValue));
+            ItemResponse<ItemType> response = await _container.CreateItemAsync(item);
+            return response.Resource;
         }
 
         /// <summary>
@@ -138,7 +139,7 @@ namespace CurrencyMonitor.DataAccess
         /// <param name="item">Das zu ändernde Element.</param>
         public async Task UpdateItemAsync(ItemType item)
         {
-            await _container.UpsertItemAsync(item, new PartitionKey(item.PartitionKeyValue));
+            await _container.UpsertItemAsync(item);
         }
 
     }// end of class CosmosDbService
