@@ -64,11 +64,6 @@ namespace CurrencyMonitor.DataAccess
             return results;
         }
 
-        /// <summary>
-        /// Holt ein Element in der Datenbank.
-        /// </summary>
-        /// <param name="partitionKey">Der Partitionsschlüssel.</param>
-        /// <param name="id">Die Identifikation des Elements.</param>
         public async Task<ItemType> GetItemAsync(string partitionKey, string id)
         {
             try
@@ -83,13 +78,6 @@ namespace CurrencyMonitor.DataAccess
             }
         }
 
-        /// <summary>
-        /// Stellt das Anzahl von bisherig gespeicherten Elementen.
-        /// </summary>
-        /// <returns>
-        /// Wie viele Element des Typs in der Datenbank dastehen,
-        /// oder eine negative Nummer, wenn es einen Fehler gibt.
-        /// </returns>
         public async Task<int> GetItemCountAsync()
         {
             using FeedIterator<int> query = _container.GetItemQueryIterator<int>(
@@ -111,11 +99,6 @@ namespace CurrencyMonitor.DataAccess
             return response.First();
         }
 
-        /// <summary>
-        /// Fügt ein neues Element in der Datenbank hinzu.
-        /// </summary>
-        /// <param name="item">Das zu speichernde Element.</param>
-        /// <remarks>Ein neues ID wird geschaffen für das neue Element.</remarks>
         public async Task<ItemType> AddItemAsync(ItemType item)
         {
             item = item.ShallowCopy<ItemType>();
@@ -124,34 +107,18 @@ namespace CurrencyMonitor.DataAccess
             return response.Resource;
         }
 
-        /// <summary>
-        /// Löscht ein Element in der Datenbank.
-        /// </summary>
-        /// <param name="partitionKey">Der Partitionsschlüssel.</param>
-        /// <param name="id">Die Identifikation des Elements.</param>
         public async Task DeleteItemAsync(string partitionKey, string id)
         {
             await _container.DeleteItemAsync<ItemType>(id, new PartitionKey(partitionKey));
         }
 
-        /// <summary>
-        /// Ändert ein vorherig bestehendes Element, oder
-        /// wenn es nicht vorhanden ist, wird es hinzugefügt. 
-        /// </summary>
-        /// <param name="partitionKey">Der urprüngliche Partitionsschlüssel (vor der Änderung) des Elements.</param>
-        /// <param name="item">Das zu speichernde geänderte Element.</param>
-        /// <remarks>
-        /// Achtung!
-        /// (1) Anders als das Hinzufügen, erwartungsmäßig wird kein neues ID für das zu ändernde
-        /// Element geschaffen. Das im Element bestehende ID muss passend sein.
-        /// (2) Wenn der gegebene ursprüngliche Partitionsschlüssel nicht mit dem Wert im gegebenen
-        /// zu ändernden Element übereinstimmt, heißt es, dass solches Element auf eine andere Partition
-        /// verschoben wird. Bevor es in der neuen Partition hinzugefügt wird, muss es zuerst in der
-        /// bisherigen gelöscht werden. Wenn der ursprüngliche Wert nicht stimmt, dann wird es nicht
-        /// gefunden und die ganze Operation scheitert.
-        /// </remarks>
         public async Task UpsertItemAsync(string partitionKey, ItemType item)
         {
+            if (string.IsNullOrWhiteSpace(item.Id))
+            {
+                throw new ArgumentException("Das ID des zu ändernden Elements darf nicht leer sein!");
+            }
+
             if (string.IsNullOrWhiteSpace(partitionKey))
             {
                 throw new ArgumentException(

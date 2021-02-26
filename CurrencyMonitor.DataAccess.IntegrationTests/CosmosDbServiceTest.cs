@@ -59,7 +59,8 @@ namespace CurrencyMonitor.DataAccess.IntegrationTests
 
             // Überprüfung:
             using var cosmosDataAccess = Fixture.GetAccessToCosmosContainerData();
-            var storedItems = cosmosDataAccess.CollectResultsFromQuery(source => source.Select(item => item));
+            var storedItems = cosmosDataAccess.CollectResultsFromQuery(
+                source => source.Select(item => item).OrderBy(item => item.Id));
             Assert.Equal(expectedItems.Count, storedItems.Count());
             Assert.All(storedItems, item => Assert.False(string.IsNullOrEmpty(item.Id)));
 
@@ -72,15 +73,15 @@ namespace CurrencyMonitor.DataAccess.IntegrationTests
                     });
             }
 
-            var returnedItems = (from task in tasks select task.Result);
+            var returnedItems = (from task in tasks select task.Result).OrderBy(item => item.Id);
             Assert.Equal(
                 returnedItems,
                 storedItems,
                 new DataModels.CosmosStoredItemComparer<TestItem>());
         }
 
-        private IEnumerable<TestItem> AddAndRetrieveItems(
-            IList<TestItem> items, ContainerDataAutoReset cosmosDataAccess)
+        private IEnumerable<TestItem> AddAndRetrieveItems(IList<TestItem> items,
+                                                          ContainerDataAutoReset cosmosDataAccess)
         {
             var itemsAddedToContainer = cosmosDataAccess.AddToContainer(items);
 
