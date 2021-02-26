@@ -42,11 +42,6 @@ namespace CurrencyMonitor.DataAccess
             _container = dbClient.GetContainer(databaseName, DataModels.CosmosDbPartitionedItem<ItemType>.ContainerName);
         }
 
-        /// <summary>
-        /// Fragt die Datenbank ab.
-        /// </summary>
-        /// <param name="query">Die LINQ-Abfrage.</param>
-        /// <returns>Die von der Abfrage zurückgegebenen Elemente.</returns>
         public async Task<IEnumerable<ItemType>> QueryAsync(
             Func<IOrderedQueryable<ItemType>, IQueryable<ItemType>> query)
         {

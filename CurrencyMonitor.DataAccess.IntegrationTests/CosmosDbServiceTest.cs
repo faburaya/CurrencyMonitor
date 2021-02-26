@@ -281,6 +281,63 @@ namespace CurrencyMonitor.DataAccess.IntegrationTests
             );
         }
 
+        [Fact]
+        public void Query_WhenNotPresent_ReturnNothing()
+        {
+            using var cosmosDataAccess = Fixture.GetAccessToCosmosContainerData();
+
+            var addedItems = AddAndRetrieveItems(new List<TestItem> {
+                new TestItem { Name = "Paloma", Family = "Farah" },
+                new TestItem { Name = "Andressa", Family = "Rabah" },
+            }, cosmosDataAccess);
+
+            var results = Fixture.Service.QueryAsync(source =>
+                source.Where(item => item.Name == "Liane")
+                      .Select(item => item)).Result;
+
+            Assert.Empty(results);
+        }
+
+        [Fact]
+        public void Query_WhenPresent_IfOne_ReturnIt()
+        {
+            using var cosmosDataAccess = Fixture.GetAccessToCosmosContainerData();
+
+            var addedItems = AddAndRetrieveItems(new List<TestItem> {
+                new TestItem { Name = "Paloma", Family = "Farah" },
+                new TestItem { Name = "Andressa", Family = "Rabah" },
+            }, cosmosDataAccess);
+
+            var itemToQuery = addedItems.First();
+
+            var task = Fixture.Service.QueryAsync(source =>
+                source.Where(item => item.Name == itemToQuery.Name && item.Family == itemToQuery.Family)
+                      .Select(item => item));
+
+            var retrievedItem = task.Result.FirstOrDefault();
+            Assert.NotNull(retrievedItem);
+            Assert.True(itemToQuery.IsEquivalentInStorageTo(retrievedItem));
+        }
+
+        [Fact]
+        public void Query_WhenPresent_IfMany_ReturnThem()
+        {
+            using var cosmosDataAccess = Fixture.GetAccessToCosmosContainerData();
+
+            var addedItems = AddAndRetrieveItems(new List<TestItem> {
+                new TestItem { Name = "Paloma", Family = "Farah" },
+                new TestItem { Name = "Andressa", Family = "Rabah" },
+            }, cosmosDataAccess);
+
+            var retrievedItems = Fixture.Service.QueryAsync(
+                source => source.Select(item => item).OrderBy(item => item.Family)).Result;
+
+            Assert.NotEmpty(retrievedItems);
+            Assert.Equal(addedItems.OrderBy(item => item.Family),
+                         retrievedItems,
+                         new DataModels.CosmosStoredItemComparer<TestItem>());
+        }
+
     }// end of class CosmosDbServiceTest
 
 }// end of namespace CurrencyMonitor.DataAccess.IntegrationTests

@@ -11,6 +11,11 @@ namespace CurrencyMonitor.DataAccess
     /// <typeparam name="ItemType">Der Typ in der Datenbank, mit dem man umgehen will.</typeparam>
     public interface ICosmosDbService<ItemType>
     {
+        /// <summary>
+        /// Fragt die Datenbank ab.
+        /// </summary>
+        /// <param name="query">Die LINQ-Abfrage.</param>
+        /// <returns>Die von der Abfrage zurückgegebenen Elemente.</returns>
         Task<IEnumerable<ItemType>> QueryAsync(Func<IOrderedQueryable<ItemType>, IQueryable<ItemType>> query);
 
         /// <summary>
