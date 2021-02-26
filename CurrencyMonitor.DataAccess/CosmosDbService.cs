@@ -115,6 +115,7 @@ namespace CurrencyMonitor.DataAccess
         /// Fügt ein neues Element in der Datenbank hinzu.
         /// </summary>
         /// <param name="item">Das zu speichernde Element.</param>
+        /// <remarks>Ein neues ID wird geschaffen für das neue Element.</remarks>
         public async Task<ItemType> AddItemAsync(ItemType item)
         {
             item = item.ShallowCopy<ItemType>();
@@ -134,11 +135,36 @@ namespace CurrencyMonitor.DataAccess
         }
 
         /// <summary>
-        /// Ändert ein vorherig bestehendes Element.
+        /// Ändert ein vorherig bestehendes Element, oder
+        /// wenn es nicht vorhanden ist, wird es hinzugefügt. 
         /// </summary>
-        /// <param name="item">Das zu ändernde Element.</param>
-        public async Task UpdateItemAsync(ItemType item)
+        /// <param name="partitionKey">Der urprüngliche Partitionsschlüssel (vor der Änderung) des Elements.</param>
+        /// <param name="item">Das zu speichernde geänderte Element.</param>
+        /// <remarks>
+        /// Achtung!
+        /// (1) Anders als das Hinzufügen, erwartungsmäßig wird kein neues ID für das zu ändernde
+        /// Element geschaffen. Das im Element bestehende ID muss passend sein.
+        /// (2) Wenn der gegebene ursprüngliche Partitionsschlüssel nicht mit dem Wert im gegebenen
+        /// zu ändernden Element übereinstimmt, heißt es, dass solches Element auf eine andere Partition
+        /// verschoben wird. Bevor es in der neuen Partition hinzugefügt wird, muss es zuerst in der
+        /// bisherigen gelöscht werden. Wenn der ursprüngliche Wert nicht stimmt, dann wird es nicht
+        /// gefunden und die ganze Operation scheitert.
+        /// </remarks>
+        public async Task UpsertItemAsync(string partitionKey, ItemType item)
         {
+            if (string.IsNullOrWhiteSpace(partitionKey))
+            {
+                throw new ArgumentException(
+                    "Der gegebene ursprüngliche Partitionsschlüssel des Elements darf nicht leer sein!");
+            }
+
+            // Verändert sich der Partitionsschlüssel?
+            if (item.PartitionKeyValue != partitionKey)
+            {
+                // zuerst löscht das ursprüngliche Element:
+                await _container.DeleteItemAsync<ItemType>(item.Id, new PartitionKey(partitionKey));
+            }
+
             await _container.UpsertItemAsync(item);
         }
 

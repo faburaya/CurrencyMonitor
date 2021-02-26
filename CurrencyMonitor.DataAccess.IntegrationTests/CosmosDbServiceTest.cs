@@ -93,6 +93,79 @@ namespace CurrencyMonitor.DataAccess.IntegrationTests
         }
 
         [Fact]
+        public void UpsertItem_WhenNotPresent_ThenAddIt()
+        {
+            using var cosmosDataAccess = Fixture.GetAccessToCosmosContainerData();
+
+            var availableItems = AddAndRetrieveItems(new List<TestItem> {
+                new TestItem { Name = "Paloma", Family = "Farah" },
+                new TestItem { Name = "Andressa", Family = "Rabah" },
+            }, cosmosDataAccess);
+
+            var newItem = new TestItem { Id = "CAFEBABE", Name = "Liane", Family = "Oliveira" };
+            Fixture.Service.UpsertItemAsync(newItem.PartitionKeyValue, newItem).Wait();
+
+            // Überprüft, dass das Element tatsächliche so gespeichert wurde:
+            var results = cosmosDataAccess.CollectResultsFromQuery(source => source.Select(item => item));
+            Assert.Equal(availableItems.Count() + 1, results.Count);
+            Assert.Contains(results, storedItem => storedItem.IsEquivalentInStorageTo(newItem));
+            foreach (TestItem item in availableItems)
+            {
+                Assert.Contains(results, storedItem => storedItem.IsEquivalentInStorageTo(item));
+            }
+        }
+
+        [Fact]
+        public void UpsertItem_WhenPresent_IfOtherPropertyChanges_ThenUpdateIt()
+        {
+            using var cosmosDataAccess = Fixture.GetAccessToCosmosContainerData();
+
+            var availableItems = AddAndRetrieveItems(new List<TestItem> {
+                new TestItem { Name = "Paloma", Family = "Farah" },
+                new TestItem { Name = "Andressa", Family = "Rabah" },
+            }, cosmosDataAccess);
+
+            TestUpdateItem(cosmosDataAccess,
+                           availableItems,
+                           availableItems.First(),
+                           item => item.Name = "Liane");
+        }
+
+        [Fact]
+        public void UpsertItem_WhenPresent_IfPartitionKeyChanges_ThenUpdateIt()
+        {
+            using var cosmosDataAccess = Fixture.GetAccessToCosmosContainerData();
+
+            var availableItems = AddAndRetrieveItems(new List<TestItem> {
+                new TestItem { Name = "Paloma", Family = "Farah" },
+                new TestItem { Name = "Andressa", Family = "Rabah" },
+            }, cosmosDataAccess);
+
+            TestUpdateItem(cosmosDataAccess,
+                           availableItems,
+                           availableItems.Last(),
+                           item => item.Family = "Oliveira");
+        }
+
+        void TestUpdateItem(ContainerDataAutoReset cosmosDataAccess,
+                            IEnumerable<TestItem> availableItems,
+                            TestItem itemToUpdate,
+                            Action<TestItem> mutate)
+        {
+            string originalPartitionKey = itemToUpdate.PartitionKeyValue;
+            mutate(itemToUpdate);
+            Fixture.Service.UpsertItemAsync(originalPartitionKey, itemToUpdate).Wait();
+
+            // Überprüft, dass das Element tatsächliche so gespeichert wurde:
+            var results = cosmosDataAccess.CollectResultsFromQuery(source => source.Select(item => item));
+            foreach (TestItem item in availableItems)
+            {
+                Assert.Contains(results, storedItem => storedItem.IsEquivalentInStorageTo(item));
+            }
+            Assert.Equal(availableItems.Count(), results.Count());
+        }
+
+        [Fact]
         public void DeleteItem_WhenDistinct_IfAllDeleted_ThenNothingRemains()
         {
             using var cosmosDataAccess = Fixture.GetAccessToCosmosContainerData();

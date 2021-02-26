@@ -21,6 +21,6 @@ namespace CurrencyMonitor.DataAccess
 
         Task DeleteItemAsync(string partitionKey, string id);
 
-        Task UpdateItemAsync(ItemType item);
+        Task UpsertItemAsync(string partitionKey, ItemType item);
     }
 }
