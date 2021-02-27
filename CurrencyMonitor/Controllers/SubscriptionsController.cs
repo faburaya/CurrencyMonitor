@@ -1,68 +1,80 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace CurrencyMonitor.Controllers
 {
     public class SubscriptionsController : Controller
     {
-        private readonly DataAccess.CurrencyMonitorContext _context;
+        private readonly DataAccess.ICosmosDbService<DataModels.SubscriptionForExchangeRate> _dbServiceSubscriptions;
+        private readonly DataAccess.ICosmosDbService<DataModels.RecognizedCurrency> _dbServiceCurrencies;
 
-        public SubscriptionsController(DataAccess.CurrencyMonitorContext context)
+        public SubscriptionsController(
+            DataAccess.ICosmosDbService<DataModels.SubscriptionForExchangeRate> dbServiceSubscriptions,
+            DataAccess.ICosmosDbService<DataModels.RecognizedCurrency> dbServiceCurrencies)
         {
-            _context = context;
+            this._dbServiceSubscriptions = dbServiceSubscriptions;
+            this._dbServiceCurrencies = dbServiceCurrencies;
+        }
+
+        private async Task<IEnumerable<DataModels.RecognizedCurrency>> GetAllRecognizedCurrenciesAsync()
+        {
+            return await _dbServiceCurrencies.QueryAsync(cosmos => cosmos.Select(item => item));
         }
 
         // GET: Subscriptions
         public async Task<IActionResult> Index(string emailFilter)
         {
+            var getAllCurrencies = GetAllRecognizedCurrenciesAsync();
+
             if (string.IsNullOrWhiteSpace(emailFilter))
             {
-                return View(await (
-                    from subscription in _context.SubscriptionForExchangeRate
-                    select new Models.SubscriptionViewModel(subscription, _context.RecognizedCurrency.ToList())
-                ).ToListAsync());
+                var allItems =
+                    await _dbServiceSubscriptions.QueryAsync(cosmos => cosmos.Select(item => item));
+                return View(
+                    allItems.Select(item => new Models.SubscriptionViewModel(item, getAllCurrencies.Result))
+                );
             }
             else
             {
-                var searchResults = (
-                    from subscription in _context.SubscriptionForExchangeRate
-                    where subscription.EMailAddress.Contains(emailFilter)
-                    select new Models.SubscriptionViewModel(subscription, _context.RecognizedCurrency.ToList())
+                var filteredItems = await _dbServiceSubscriptions.QueryAsync(cosmos =>
+                    cosmos.Where(item => item.EMailAddress.Contains(emailFilter))
+                        .Select(item => item)
                 );
-
-                return View(await searchResults.ToListAsync());
+                return View(
+                    filteredItems.Select(item => new Models.SubscriptionViewModel(item, getAllCurrencies.Result))
+                );
             }
         }
 
-        // GET: Subscriptions/Details/5
-        public async Task<IActionResult> Details(int? id)
+        // GET: Subscriptions/Details/partitionKey?id
+        public async Task<IActionResult> Details(string partitionKey, string id)
         {
-            if (id == null)
+            if (string.IsNullOrWhiteSpace(partitionKey) || string.IsNullOrWhiteSpace(id))
             {
                 return NotFound();
             }
 
-            DataModels.SubscriptionForExchangeRate subscription = await _context.SubscriptionForExchangeRate
-                .FirstOrDefaultAsync(m => m.ID == id);
+            var getAllCurrencies = GetAllRecognizedCurrenciesAsync();
+
+            DataModels.SubscriptionForExchangeRate subscription =
+                await _dbServiceSubscriptions.GetItemAsync(partitionKey, id);
             if (subscription == null)
             {
                 return NotFound();
             }
 
-            return View(
-                new Models.SubscriptionViewModel(subscription, _context.RecognizedCurrency.ToList())
-            );
+            return View(new Models.SubscriptionViewModel(subscription, await getAllCurrencies));
         }
 
         // GET: Subscriptions/Create
         public IActionResult Create()
         {
             return View(
-                new Models.SubscriptionViewModel(null, _context.RecognizedCurrency.ToList())
+                new Models.SubscriptionViewModel(null, GetAllRecognizedCurrenciesAsync().Result)
             );
         }
 
@@ -71,46 +83,51 @@ namespace CurrencyMonitor.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Label,EMailAddress,CodeCurrencyToSell,CodeCurrencyToBuy,TargetPriceOfSellingCurrency")] DataModels.SubscriptionForExchangeRate subscription)
+        public async Task<IActionResult> Create(
+            [Bind("Id,Label,EMailAddress,CodeCurrencyToSell,CodeCurrencyToBuy,TargetPriceOfSellingCurrency")] DataModels.SubscriptionForExchangeRate subscription)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(subscription);
-                await _context.SaveChangesAsync();
+                await _dbServiceSubscriptions.AddItemAsync(subscription);
                 return RedirectToAction(nameof(Index));
             }
+
             return View(
-                new Models.SubscriptionViewModel(subscription, _context.RecognizedCurrency.ToList())
+                new Models.SubscriptionViewModel(subscription, await GetAllRecognizedCurrenciesAsync())
             );
         }
 
-        // GET: Subscriptions/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        // GET: Subscriptions/Edit/partitionKey?id
+        public async Task<IActionResult> Edit(string partitionKey, string id)
         {
-            if (id == null)
+            if (string.IsNullOrWhiteSpace(partitionKey) || string.IsNullOrWhiteSpace(id))
             {
                 return NotFound();
             }
 
-            DataModels.SubscriptionForExchangeRate subscription = await _context.SubscriptionForExchangeRate.FindAsync(id);
+            var getAllCurrencies = GetAllRecognizedCurrenciesAsync();
+
+            DataModels.SubscriptionForExchangeRate subscription =
+                await _dbServiceSubscriptions.GetItemAsync(partitionKey, id);
             if (subscription == null)
             {
                 return NotFound();
             }
 
             return View(
-                new Models.SubscriptionViewModel(subscription, _context.RecognizedCurrency.ToList())
+                new Models.SubscriptionViewModel(subscription, await getAllCurrencies)
             );
         }
 
-        // POST: Subscriptions/Edit/5
+        // POST: Subscriptions/Edit/partitionKey
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Label,EMailAddress,CodeCurrencyToSell,CodeCurrencyToBuy,TargetPriceOfSellingCurrency")] DataModels.SubscriptionForExchangeRate subscription)
+        public async Task<IActionResult> Edit(string partitionKey,
+            [Bind("Id,Label,EMailAddress,CodeCurrencyToSell,CodeCurrencyToBuy,TargetPriceOfSellingCurrency")] DataModels.SubscriptionForExchangeRate subscription)
         {
-            if (id != subscription.ID)
+            if (string.IsNullOrWhiteSpace(partitionKey) || string.IsNullOrWhiteSpace(subscription.Id))
             {
                 return NotFound();
             }
@@ -119,12 +136,11 @@ namespace CurrencyMonitor.Controllers
             {
                 try
                 {
-                    _context.Update(subscription);
-                    await _context.SaveChangesAsync();
+                    await _dbServiceSubscriptions.UpsertItemAsync(partitionKey, subscription);
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (Exception)
                 {
-                    if (!SubscriptionForExchangeRateExists(subscription.ID))
+                    if (await _dbServiceSubscriptions.GetItemAsync(partitionKey, subscription.Id) == null)
                     {
                         return NotFound();
                     }
@@ -133,48 +149,46 @@ namespace CurrencyMonitor.Controllers
                         throw;
                     }
                 }
+
                 return RedirectToAction(nameof(Index));
             }
 
             return View(
-                new Models.SubscriptionViewModel(subscription, _context.RecognizedCurrency.ToList())
+                new Models.SubscriptionViewModel(subscription, await GetAllRecognizedCurrenciesAsync())
             );
         }
 
-        // GET: Subscriptions/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // GET: Subscriptions/Delete/partitionKey?id
+        public async Task<IActionResult> Delete(string partitionKey, string id)
         {
-            if (id == null)
+            if (string.IsNullOrWhiteSpace(partitionKey) || string.IsNullOrWhiteSpace(id))
             {
                 return NotFound();
             }
 
-            DataModels.SubscriptionForExchangeRate subscription = await _context.SubscriptionForExchangeRate
-                .FirstOrDefaultAsync(m => m.ID == id);
+            var getAllCurrencies = GetAllRecognizedCurrenciesAsync();
+
+            DataModels.SubscriptionForExchangeRate subscription =
+                await _dbServiceSubscriptions.GetItemAsync(partitionKey, id);
             if (subscription == null)
             {
                 return NotFound();
             }
 
             return View(
-                new Models.SubscriptionViewModel(subscription, _context.RecognizedCurrency.ToList())
+                new Models.SubscriptionViewModel(subscription, await getAllCurrencies)
             );
         }
 
-        // POST: Subscriptions/Delete/5
+        // POST: Subscriptions/Delete/partitionKey?id
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(string partitionKey, string id)
         {
-            var subscriptionForExchangeRate = await _context.SubscriptionForExchangeRate.FindAsync(id);
-            _context.SubscriptionForExchangeRate.Remove(subscriptionForExchangeRate);
-            await _context.SaveChangesAsync();
+            await _dbServiceSubscriptions.DeleteItemAsync(partitionKey, id);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool SubscriptionForExchangeRateExists(int id)
-        {
-            return _context.SubscriptionForExchangeRate.Any(e => e.ID == id);
-        }
-    }
-}
+    }// end of class SubscriptionController
+
+}//end of namespace CurrencyMonitor.Controllers

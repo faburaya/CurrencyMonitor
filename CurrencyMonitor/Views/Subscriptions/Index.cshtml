@@ -49,9 +49,9 @@
                 @Html.DisplayFor(modelItem => item.TargetLabel)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.ID">Bearbeiten</a> |
-                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ID">Löschen</a>
+                <a asp-action="Edit" asp-route-partitionkey="@item.PartitionKeyValue" asp-route-id="@item.Id">Bearbeiten</a> |
+                <a asp-action="Details" asp-route-partitionkey="@item.PartitionKeyValue" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-partitionkey="@item.PartitionKeyValue" asp-route-id="@item.Id">Löschen</a>
             </td>
         </tr>
 }

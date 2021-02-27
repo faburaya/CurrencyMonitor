@@ -15,7 +15,7 @@ namespace CurrencyMonitor.Models
         {
             if (subscription != null)
             {
-                this.ID = subscription.ID;
+                this.Id = subscription.Id;
                 this.Label = subscription.Label;
                 this.EMailAddress = subscription.EMailAddress;
                 this.CodeCurrencyToSell = subscription.CodeCurrencyToSell;

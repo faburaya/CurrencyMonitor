@@ -10,7 +10,6 @@ namespace CurrencyMonitor.DataModels
     /// </summary>
     public abstract class CosmosDbItem
     {
-        [Required]
         [JsonProperty(PropertyName = "id")]
         public string Id { get; set; }
 

@@ -24,7 +24,7 @@ namespace CurrencyMonitor.DataAccess
 
         public bool IsEmpty()
         {
-            return (DatabaseService.GetItemCountAsync().Result > 0);
+            return (DatabaseService.GetItemCountAsync().Result == 0);
         }
 
         public void Insert(DataType obj)

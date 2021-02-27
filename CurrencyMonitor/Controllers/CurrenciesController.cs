@@ -1,19 +1,18 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using CurrencyMonitor.DataAccess;
-using CurrencyMonitor.DataModels;
 
 namespace CurrencyMonitor.Controllers
 {
     public class CurrenciesController : Controller
     {
-        private readonly CurrencyMonitorContext _context;
+        private readonly DataAccess.ICosmosDbService<DataModels.RecognizedCurrency> _dbService;
 
-        public CurrenciesController(CurrencyMonitorContext context)
+        public CurrenciesController(DataAccess.ICosmosDbService<DataModels.RecognizedCurrency> dbService)
         {
-            _context = context;
+            this._dbService = dbService;
         }
 
         // GET: Currencies
@@ -21,32 +20,31 @@ namespace CurrencyMonitor.Controllers
         {
             if (string.IsNullOrWhiteSpace(searchString))
             {
-                return View(await _context.RecognizedCurrency.ToListAsync());
+                return View(await _dbService.QueryAsync(cosmos => cosmos.Select(item => item)));
             }
             else
             {
-                var results = (from currency in _context.RecognizedCurrency
-                               where currency.Code.Contains(searchString)
-                                || currency.Name.Contains(searchString)
-                                || currency.Symbol.Contains(searchString)
-                                || currency.Country.Contains(searchString)
-                               orderby currency.Code
-                               select currency);
-
-                return View(await results.ToListAsync());
+                return View(await _dbService.QueryAsync(cosmos =>
+                    cosmos.Where(item =>
+                        item.Code.Contains(searchString)
+                        || item.Name.Contains(searchString)
+                        || item.Symbol.Contains(searchString)
+                        || item.Country.Contains(searchString))
+                    .OrderBy(item => item.Code)
+                    .Select(item => item))
+                );
             }
         }
 
-        // GET: Currencies/Details/5
-        public async Task<IActionResult> Details(int? id)
+        // GET: Currencies/Details/partitionKey?id
+        public async Task<IActionResult> Details(string partitionKey, string id)
         {
-            if (id == null)
+            if (string.IsNullOrWhiteSpace(partitionKey) || string.IsNullOrWhiteSpace(id))
             {
                 return NotFound();
             }
 
-            var recognizedCurrency = await _context.RecognizedCurrency
-                .FirstOrDefaultAsync(m => m.ID == id);
+            var recognizedCurrency = await _dbService.GetItemAsync(partitionKey, id);
             if (recognizedCurrency == null)
             {
                 return NotFound();
@@ -66,41 +64,44 @@ namespace CurrencyMonitor.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Code,Name,Symbol,Country")] RecognizedCurrency recognizedCurrency)
+        public async Task<IActionResult> Create(
+            [Bind("Id,Code,Name,Symbol,Country")] DataModels.RecognizedCurrency recognizedCurrency)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(recognizedCurrency);
-                await _context.SaveChangesAsync();
+                await _dbService.AddItemAsync(recognizedCurrency);
                 return RedirectToAction(nameof(Index));
             }
+
             return View(recognizedCurrency);
         }
 
-        // GET: Currencies/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        // GET: Currencies/Edit/partitionKey?id
+        public async Task<IActionResult> Edit(string partitionKey, string id)
         {
-            if (id == null)
+            if (string.IsNullOrWhiteSpace(partitionKey) || string.IsNullOrWhiteSpace(id))
             {
                 return NotFound();
             }
 
-            var recognizedCurrency = await _context.RecognizedCurrency.FindAsync(id);
+            var recognizedCurrency = await _dbService.GetItemAsync(partitionKey, id);
             if (recognizedCurrency == null)
             {
                 return NotFound();
             }
+
             return View(recognizedCurrency);
         }
 
-        // POST: Currencies/Edit/5
+        // POST: Currencies/Edit/partitionKey
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Code,Name,Symbol,Country")] RecognizedCurrency recognizedCurrency)
+        public async Task<IActionResult> Edit(string partitionKey,
+            [Bind("Id,Code,Name,Symbol,Country")] DataModels.RecognizedCurrency recognizedCurrency)
         {
-            if (id != recognizedCurrency.ID)
+            if (string.IsNullOrWhiteSpace(partitionKey) || string.IsNullOrWhiteSpace(recognizedCurrency.Id))
             {
                 return NotFound();
             }
@@ -109,12 +110,11 @@ namespace CurrencyMonitor.Controllers
             {
                 try
                 {
-                    _context.Update(recognizedCurrency);
-                    await _context.SaveChangesAsync();
+                    await _dbService.UpsertItemAsync(partitionKey, recognizedCurrency);
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (Exception)
                 {
-                    if (!RecognizedCurrencyExists(recognizedCurrency.ID))
+                    if (await _dbService.GetItemAsync(partitionKey, recognizedCurrency.Id) == null)
                     {
                         return NotFound();
                     }
@@ -125,19 +125,19 @@ namespace CurrencyMonitor.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
             return View(recognizedCurrency);
         }
 
-        // GET: Currencies/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // GET: Currencies/Delete/partitionKey?id
+        public async Task<IActionResult> Delete(string partitionKey, string id)
         {
-            if (id == null)
+            if (string.IsNullOrWhiteSpace(partitionKey) || string.IsNullOrWhiteSpace(id))
             {
                 return NotFound();
             }
 
-            var recognizedCurrency = await _context.RecognizedCurrency
-                .FirstOrDefaultAsync(m => m.ID == id);
+            var recognizedCurrency = await _dbService.GetItemAsync(partitionKey, id);
             if (recognizedCurrency == null)
             {
                 return NotFound();
@@ -146,20 +146,15 @@ namespace CurrencyMonitor.Controllers
             return View(recognizedCurrency);
         }
 
-        // POST: Currencies/Delete/5
+        // POST: Currencies/Delete/partitionKey?id
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(string partitionKey, string id)
         {
-            var recognizedCurrency = await _context.RecognizedCurrency.FindAsync(id);
-            _context.RecognizedCurrency.Remove(recognizedCurrency);
-            await _context.SaveChangesAsync();
+            await _dbService.DeleteItemAsync(partitionKey, id);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool RecognizedCurrencyExists(int id)
-        {
-            return _context.RecognizedCurrency.Any(e => e.ID == id);
-        }
-    }
-}
+    } // end of class CurrenciesController
+
+}// end of namespace CurrencyMonitor.Controllers
