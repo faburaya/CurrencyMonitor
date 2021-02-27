@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.EntityFrameworkCore;
 
 namespace CurrencyMonitor
 {
@@ -72,9 +71,6 @@ namespace CurrencyMonitor
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-
-            //services.AddDbContext<DataAccess.CurrencyMonitorContext>(options =>
-            //    options.UseSqlServer(GetSecretConnectionString("CurrencyMonitorContext")));
 
             InjectCosmosDbService<DataModels.RecognizedCurrency>(services);
             InjectCosmosDbService<DataModels.SubscriptionForExchangeRate>(services);
