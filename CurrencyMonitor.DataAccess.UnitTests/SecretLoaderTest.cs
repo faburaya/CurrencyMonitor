@@ -13,7 +13,14 @@ namespace CurrencyMonitor.DataAccess.UnitTests
 
         private string DeploymentXmlNamespace => "http://www.currencymonitor.com/secrets";
 
-        private string CreateValidXml(string[] innerXmlElements)
+        [Fact]
+        public void GetDatabaseConnString_WhenXmlFileUnavailable_ThenThrow()
+        {
+            Assert.Throws<System.IO.FileNotFoundException>(() => new SecretLoader(
+                new XmlMetadata(DeploymentXmlNamespace, "nicht vorhandene Datei", SchemaDeploymentFilePath)));
+        }
+
+        private static string CreateValidXml(string[] innerXmlElements)
         {
             var buffer = new System.Text.StringBuilder();
             foreach (string entry in innerXmlElements)
@@ -52,7 +59,7 @@ namespace CurrencyMonitor.DataAccess.UnitTests
         }
 
         [Fact]
-        public void GetDatabaseConnString_WhenNameUnavailable_ThenThrow()
+        public void GetDatabaseConnString_WhenNameUnavailable_ThenNull()
         {
             File.WriteAllText(TestFilePath, CreateValidXml(new string[] {
                 MakeXmlElementForConnection("eins", "Server=Server1;Database=Datenbank1;User ID=Benutzer1;Password=Passwort1;")
@@ -61,7 +68,7 @@ namespace CurrencyMonitor.DataAccess.UnitTests
             var secretLoader = new SecretLoader(
                 new XmlMetadata(DeploymentXmlNamespace, TestFilePath, SchemaDeploymentFilePath));
 
-            Assert.Throws<ApplicationException>(() => secretLoader.GetDatabaseConnString("zwei"));
+            Assert.Null(secretLoader.GetDatabaseConnString("zwei"));
 
             File.Delete(TestFilePath);
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -20,29 +21,38 @@ namespace CurrencyMonitor
 
         /// <summary>
         /// Ersetzt die herkömmliche Beschaffung der Verbindungszeichenfolge.
-        /// Der geheime Teil der Verbindungszeichenfolge kommt aus einer versteckten XML Datei.
-        /// Das Geheim kann entweder als Verbindungszeichenfolge genutzt werden
-        /// oder die Verbindungszeichenfolge aus den Einstellungen der Anwendung ergänzen.
+        /// Die geheime Verbindungszeichenfolge kommt aus einer versteckten XML Datei.
+        /// Wenn solche Datei nicht vorhanden ist, holt es die Verbindungszeichenfolge
+        /// aus den Einstellungen der Anwendung heraus.
         /// </summary>
         /// <param name="connectionName">Der Name der Verbindung.</param>
-        /// <returns>Die Verbindugszeichenfolge für die Datenbank im Einsatz.</returns>
+        /// <returns>
+        /// Die Verbindugszeichenfolge für die Datenbank im Einsatz, wenn vorhanden, andernfalls <c>null</c>.
+        /// </returns>
         private string GetSecretConnectionString(string connectionName)
         {
-            var secretLoader = new DataAccess.SecretLoader(
-                new DataAccess.XmlMetadata(
-                    "http://www.currencymonitor.com/secrets",
-                    System.IO.Path.Combine("Data", "secrets.xml"),
-                    System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "secrets.xsd"))
-            );
-            string secret = secretLoader.GetDatabaseConnString(connectionName);
-            string connectionString = Configuration.GetConnectionString(connectionName);
+            DataAccess.SecretLoader secretLoader = null;
+            string secretFilePath = Path.Combine("Data", "secrets.xml");
+            if (File.Exists(secretFilePath))
+            {
+                secretLoader = new DataAccess.SecretLoader(
+                    new DataAccess.XmlMetadata(
+                        "http://www.currencymonitor.com/secrets",
+                        secretFilePath,
+                        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "secrets.xsd"))
+                );
+            }
 
-            if (string.IsNullOrEmpty(connectionString))
+            // versucht vorzugsweise die Verbindungszeichenkette aus den Geheimnissen herauszuholen:
+            string secret = secretLoader?.GetDatabaseConnString(connectionName);
+            if (secret != null)
             {
                 return secret;
             }
 
-            return connectionString.Replace("verborgen???", secret);
+            // ... andernfalls greift auf die herkömmliche Einstellungen zurück:
+            return Configuration.GetConnectionString(connectionName);
+            
         }
 
         /// <summary>
