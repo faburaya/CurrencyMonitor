@@ -2,6 +2,8 @@
 using System.Xml;
 using System.Linq;
 
+using Reusable.DataAccess;
+
 namespace CurrencyMonitor.DataAccess
 {
     /// <summary>

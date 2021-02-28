@@ -5,16 +5,18 @@ using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Mvc;
 
+using Reusable.DataAccess;
+
 namespace CurrencyMonitor.Controllers
 {
     public class SubscriptionsController : Controller
     {
-        private readonly DataAccess.ICosmosDbService<DataModels.SubscriptionForExchangeRate> _dbServiceSubscriptions;
-        private readonly DataAccess.ICosmosDbService<DataModels.RecognizedCurrency> _dbServiceCurrencies;
+        private readonly ICosmosDbService<DataModels.SubscriptionForExchangeRate> _dbServiceSubscriptions;
+        private readonly ICosmosDbService<DataModels.RecognizedCurrency> _dbServiceCurrencies;
 
         public SubscriptionsController(
-            DataAccess.ICosmosDbService<DataModels.SubscriptionForExchangeRate> dbServiceSubscriptions,
-            DataAccess.ICosmosDbService<DataModels.RecognizedCurrency> dbServiceCurrencies)
+            ICosmosDbService<DataModels.SubscriptionForExchangeRate> dbServiceSubscriptions,
+            ICosmosDbService<DataModels.RecognizedCurrency> dbServiceCurrencies)
         {
             this._dbServiceSubscriptions = dbServiceSubscriptions;
             this._dbServiceCurrencies = dbServiceCurrencies;

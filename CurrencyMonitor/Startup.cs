@@ -8,6 +8,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+using Reusable.DataModels;
+using Reusable.DataAccess;
+
 namespace CurrencyMonitor
 {
     public class Startup
@@ -31,15 +34,15 @@ namespace CurrencyMonitor
         /// </returns>
         private string GetSecretConnectionString(string connectionName)
         {
-            DataAccess.SecretLoader secretLoader = null;
+            SecretLoader secretLoader = null;
             string secretFilePath = Path.Combine("Data", "secrets.xml");
             if (File.Exists(secretFilePath))
             {
-                secretLoader = new DataAccess.SecretLoader(
-                    new DataAccess.XmlMetadata(
-                        "http://www.currencymonitor.com/secrets",
+                secretLoader = new SecretLoader(
+                    new XmlMetadata(
+                        "http://dataaccess.reusable.faburaya.com/secrets",
                         secretFilePath,
-                        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "secrets.xsd"))
+                        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Schema", "secrets.xsd"))
                 );
             }
 
@@ -61,13 +64,13 @@ namespace CurrencyMonitor
         /// <typeparam name="ItemType">Der Typ des Elements, den der Service behandelt.</typeparam>
         /// <param name="services">Die Sammlung, in der der Service injiziert wird.</param>
         private void InjectCosmosDbService<ItemType>(IServiceCollection services)
-            where ItemType : DataModels.CosmosDbItem
+            where ItemType : CosmosDbItem
         {
             string databaseName = Configuration.GetSection("CosmosDb").GetSection("DatabaseName").Value;
             string connectionString = GetSecretConnectionString("CurrencyMonitorCosmos");
 
-            services.AddSingleton<DataAccess.ICosmosDbService<ItemType>>(
-                DataAccess.CosmosDbService<ItemType>
+            services.AddSingleton<ICosmosDbService<ItemType>>(
+                CosmosDbService<ItemType>
                     .InitializeCosmosClientInstanceAsync(databaseName, connectionString)
                     .GetAwaiter()
                     .GetResult()

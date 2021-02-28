@@ -6,6 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
+using Reusable.DataAccess;
+
 namespace CurrencyMonitor
 {
     public class Program
@@ -20,16 +22,16 @@ namespace CurrencyMonitor
 
                 try
                 {
-                    var dbService = serviceProvider.GetRequiredService<DataAccess.ICosmosDbService<DataModels.RecognizedCurrency>>();
+                    var dbService = serviceProvider.GetRequiredService<ICosmosDbService<DataModels.RecognizedCurrency>>();
 
                     var xmlDataLoader = new DataAccess.XmlDataLoader(
-                        new DataAccess.XmlMetadata(
+                        new XmlMetadata(
                             "http://www.currencymonitor.com/deployment",
                             System.IO.Path.Combine("Data", "deployment.xml"),
                             System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "deployment.xsd"))
                     );
                     xmlDataLoader.Load(
-                        new DataAccess.CosmosDbItemAccess<DataModels.RecognizedCurrency>(dbService)
+                        new CosmosDbItemAccess<DataModels.RecognizedCurrency>(dbService)
                     );
                 }
                 catch (Exception ex)

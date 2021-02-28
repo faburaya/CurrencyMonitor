@@ -4,13 +4,15 @@ using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Mvc;
 
+using Reusable.DataAccess;
+
 namespace CurrencyMonitor.Controllers
 {
     public class CurrenciesController : Controller
     {
-        private readonly DataAccess.ICosmosDbService<DataModels.RecognizedCurrency> _dbService;
+        private readonly ICosmosDbService<DataModels.RecognizedCurrency> _dbService;
 
-        public CurrenciesController(DataAccess.ICosmosDbService<DataModels.RecognizedCurrency> dbService)
+        public CurrenciesController(ICosmosDbService<DataModels.RecognizedCurrency> dbService)
         {
             this._dbService = dbService;
         }

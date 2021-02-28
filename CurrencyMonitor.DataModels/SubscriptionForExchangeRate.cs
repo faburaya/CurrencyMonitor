@@ -3,6 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 using Newtonsoft.Json;
 
+using Reusable.DataModels;
+
 namespace CurrencyMonitor.DataModels
 {
     /// <summary>
