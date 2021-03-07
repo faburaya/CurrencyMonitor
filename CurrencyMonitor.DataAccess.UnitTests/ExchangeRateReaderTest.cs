@@ -1,46 +1,62 @@
-﻿using System;
-
-using Xunit;
+﻿using Xunit;
 
 namespace CurrencyMonitor.DataAccess.UnitTests
 {
     public class ExchangeRateReaderTest
     {
         [Fact]
-        public void Constructor_WhenCodesValid()
+        public void TryRead_WhenNotCompliant_ThenReturnFalse()
         {
-            new ExchangeRateReader("EUR", "BRL");
-        }
-
-        [Fact]
-        public void Constructor_WhenCodesInvalid_ThenThrow()
-        {
-            Assert.Throws<ArgumentException>(() => new ExchangeRateReader("EUR", "Ungültiges"));
-            Assert.Throws<ArgumentException>(() => new ExchangeRateReader("Ungültiges", "BRL"));
-        }
-
-        [Fact]
-        public void TryRead_WhenNotCompliant_ThenGiveZeroAndFalse()
-        {
-            double rate;
-            var reader = new ExchangeRateReader("EUR", "BRL");
-            Assert.False(reader.TryRead("<div>Keine nützliche Daten</div>", out rate));
+            var reader = new ExchangeRateReader();
+            Assert.False(reader.TryRead("<div>Keine nützliche Daten</div>",
+                                        out DataModels.ExchangePair exchange,
+                                        out double rate));
+            Assert.Null(exchange);
             Assert.Equal(0.0, rate);
         }
 
-        [Fact]
-        public void TryRead_WhenCompliant_ThenGiveRateAndTrue()
+        private void CheckFloatingPointValue(double expected, double actual)
         {
-            double rate;
-            var reader = new ExchangeRateReader("EUR", "BRL");
-            Assert.True(
-                reader.TryRead(@"
-                    <div class=""cc-rate"">
-                        <label title=""Exchange Rate"" id=""elb"" accesskey=""x"" for=""cc-ratebox"">Umrechnungskurs (Kauf/Verkauf)</label>
-                        <div tabindex=""4"" aria-labelledby=""elb"" id=""cc-ratebox"">BRL/EUR = 6,7805</div>
-                    </div>", out rate));
-
-            Assert.Equal(6.7805, rate);
+            double tolerance = 1e-5;
+            Assert.InRange(actual, expected - tolerance, expected + tolerance);
         }
-    }
-}
+
+        [Fact]
+        public void TryRead_WhenCompliant_IfDirectOrder_ThenReturnTrue()
+        {
+            var reader = new ExchangeRateReader();
+            Assert.True(reader.TryRead(@"
+                <div class=""cc-result"">
+	                <output id=""res1"" for=""ta"">1 BRL = 0,14748 EUR</output>
+                </div>",
+                out DataModels.ExchangePair exchange,
+                out double rate));
+
+            Assert.NotNull(exchange);
+            Assert.Equal("BRL", exchange.PrimaryCurrencyCode);
+            Assert.Equal("EUR", exchange.SecondaryCurrencyCode);
+
+            CheckFloatingPointValue(0.14748, rate);
+        }
+
+        [Fact]
+        public void TryRead_WhenCompliant_IfReverseOrder_ThenReturnTrue()
+        {
+            var reader = new ExchangeRateReader();
+            Assert.True(reader.TryRead(@"
+                <div class=""cc-result"">
+	                <output id=""res1"" for=""ta"">1 EUR = 6,7805 BRL</output>
+                </div>",
+                out DataModels.ExchangePair exchange,
+                out double rate));
+
+            Assert.NotNull(exchange);
+            Assert.Equal("BRL", exchange.PrimaryCurrencyCode);
+            Assert.Equal("EUR", exchange.SecondaryCurrencyCode);
+
+            CheckFloatingPointValue(0.14748, rate);
+        }
+
+    }// end of class ExchangeRateReaderTest
+
+}// end of namespace CurrencyMonitor.DataAccess.UnitTests

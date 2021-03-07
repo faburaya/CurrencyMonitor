@@ -7,51 +7,35 @@ namespace CurrencyMonitor.DataAccess
     /// Liest den Wert des Wechselkurses aus dem HTML-Text einer Webseite.
     /// </summary>
     /// <remarks>Diese implementierung setzt auf https://themoneyconverter.com/ </remarks>
-    public class ExchangeRateReader
+    public class ExchangeRateReader : IExchangeRateReader
     {
-        private readonly static Regex currencyCodeRegex;
+        private static readonly Regex exchangeRateRegex =
+            new Regex(@">1 ([A-Z]{3}) = (\d+[,.]\d+) ([A-Z]{3})<", RegexOptions.Compiled);
 
-        static ExchangeRateReader()
+        public bool TryRead(string hypertext,
+                            out DataModels.ExchangePair exchange,
+                            out double rate)
         {
-            currencyCodeRegex = new Regex("^[A-Z]{3}$", RegexOptions.Compiled);
-        }
+            exchange = null;
+            rate = 0.0;
 
-        private void ValidateCurrencyCode(string currencyCode)
-        {
-            if (!currencyCodeRegex.IsMatch(currencyCode))
+            var match = exchangeRateRegex.Match(hypertext);
+            if (!match.Success)
             {
-                throw new ArgumentException($"{currencyCode} is kein gültiges Code für eine Währung!");
-            }
-        }
-
-        private readonly Regex _exchangeRateRegex;
-
-        public ExchangeRateReader(string sellingCurrencyCode, string buyingCurrencyCode)
-        {
-            ValidateCurrencyCode(sellingCurrencyCode);
-            ValidateCurrencyCode(buyingCurrencyCode);
-
-            _exchangeRateRegex =
-                new Regex($@"{buyingCurrencyCode}/{sellingCurrencyCode} = (\d+,\d+)", RegexOptions.Compiled);
-        }
-
-        /// <summary>
-        /// Versucht, dem Hypertext den Wechselkurs zu entnehmen.
-        /// </summary>
-        /// <param name="hyperText">Der zu lesende HTML-Inhalt.</param>
-        /// <param name="exchangeRate">Wird den Wechselkurs zurückgewiesen.</param>
-        /// <returns>Ob das Lesen von dem Wert des Wechselkurses gelungen ist.</returns>
-        public bool TryRead(string hyperText, out double exchangeRate)
-        {
-            exchangeRate = 0.0;
-
-            var match = _exchangeRateRegex.Match(hyperText);
-            if (match.Success)
-            {
-                return double.TryParse(match.Groups[1].Value, out exchangeRate);
+                return false;
             }
 
-            return false;
+            string currencyCode1 = match.Groups[1].Value;
+            string currencyCode2 = match.Groups[3].Value;
+            exchange = new DataModels.ExchangePair(currencyCode1, currencyCode2);
+
+            rate = double.Parse(match.Groups[2].Value);
+            if (exchange.PrimaryCurrencyCode == currencyCode2)
+            {
+                rate = 1 / rate;
+            }
+
+            return true;
         }
 
     }// end of class ExchangeRateReader
