@@ -23,4 +23,10 @@
     <ProjectReference Include="..\CurrencyMonitor.DataModels\CurrencyMonitor.DataModels.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="C:\Users\felip\.nuget\packages\com.faburaya.reusable.dataaccess\1.0.3\contentFiles\any\netcoreapp3.1\Schema\secrets.xsd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
