@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 using Newtonsoft.Json;
 
@@ -17,9 +18,11 @@ namespace CurrencyMonitor.DataModels
             this.PrimaryCurrencyCode = exchange.PrimaryCurrencyCode;
             this.SecondaryCurrencyCode = exchange.SecondaryCurrencyCode;
             this.PriceOfPrimaryCurrency = rate;
+            this.Timestamp = DateTime.Now.ToUniversalTime();
         }
 
-        public override string PartitionKeyValue => CosmosDbPartitionedItem<ExchangeRate>.GetPartitionKeyValue(this);
+        public override string PartitionKeyValue
+            => CosmosDbPartitionedItem<ExchangeRate>.GetPartitionKeyValue(this);
 
         /// <summary>
         /// Code der primären Währung nach ISO-4217.
@@ -39,11 +42,17 @@ namespace CurrencyMonitor.DataModels
         public string SecondaryCurrencyCode { get; set; }
 
         /// <summary>
-        /// Preis der primären Währung.
+        /// Preis der primären Währung
+        /// (wenn sie mit der sekundären Währung gekauft wird.)
         /// </summary>
         [Required]
         [JsonProperty(PropertyName = "rate")]
         public double PriceOfPrimaryCurrency { get; set; }
+
+        [Required]
+        [DataType(DataType.DateTime)]
+        [JsonProperty(PropertyName = "timestamp")]
+        public DateTime Timestamp { get; set; }
 
     }// end of class ExchangeRate
 
