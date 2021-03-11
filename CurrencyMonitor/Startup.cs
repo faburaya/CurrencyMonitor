@@ -64,7 +64,7 @@ namespace CurrencyMonitor
         /// <typeparam name="ItemType">Der Typ des Elements, den der Service behandelt.</typeparam>
         /// <param name="services">Die Sammlung, in der der Service injiziert wird.</param>
         private void InjectCosmosDbService<ItemType>(IServiceCollection services)
-            where ItemType : CosmosDbItem
+            where ItemType : CosmosDbItem<ItemType>, IEquatable<ItemType>
         {
             string databaseName = Configuration.GetSection("CosmosDb").GetSection("DatabaseName").Value;
             string connectionString = GetSecretConnectionString("CurrencyMonitorCosmos");

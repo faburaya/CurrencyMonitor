@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 using Newtonsoft.Json;
 
@@ -10,11 +11,8 @@ namespace CurrencyMonitor.DataModels
     /// Stellt eine anerkannte Währung, etwa Real oder Euro.
     /// </summary>
     [CosmosContainer(Name = "Währung")]
-    public class RecognizedCurrency : CosmosDbItem
+    public class RecognizedCurrency : CosmosDbItem<RecognizedCurrency>, IEquatable<RecognizedCurrency>
     {
-        public override string PartitionKeyValue =>
-            CosmosDbPartitionedItem<RecognizedCurrency>.GetPartitionKeyValue(this);
-
         /// <summary>
         /// Code nach ISO-4217.
         /// </summary>
@@ -37,5 +35,15 @@ namespace CurrencyMonitor.DataModels
         [Display(Name = "Gültigkeit (Länder)")]
         [JsonProperty(PropertyName = "country")]
         public string Country { get; set; }
-    }
-}
+
+        public bool Equals(RecognizedCurrency other)
+        {
+            return this.Code == other.Code
+                && this.Name == other.Name
+                && this.Symbol == other.Symbol
+                && this.Country == other.Country;
+        }
+
+    }// end of class RecognizedCurrency
+
+}// end of namespace CurrencyMonitor.DataModels

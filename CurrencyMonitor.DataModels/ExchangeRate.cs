@@ -11,7 +11,7 @@ namespace CurrencyMonitor.DataModels
     /// Hält einen Wert des Wechselkurses.
     /// </summary>
     [CosmosContainer(Name = "Wechselkurs")]
-    public class ExchangeRate : CosmosDbItem
+    public class ExchangeRate : CosmosDbItem<ExchangeRate>, IEquatable<ExchangeRate>
     {
         public ExchangeRate(ExchangePair exchange, double rate)
         {
@@ -20,9 +20,6 @@ namespace CurrencyMonitor.DataModels
             this.PriceOfPrimaryCurrency = rate;
             this.Timestamp = DateTime.Now.ToUniversalTime();
         }
-
-        public override string PartitionKeyValue
-            => CosmosDbPartitionedItem<ExchangeRate>.GetPartitionKeyValue(this);
 
         /// <summary>
         /// Code der primären Währung nach ISO-4217.
@@ -54,6 +51,13 @@ namespace CurrencyMonitor.DataModels
         [JsonProperty(PropertyName = "timestamp")]
         public DateTime Timestamp { get; set; }
 
+        public bool Equals(ExchangeRate other)
+        {
+            return this.PrimaryCurrencyCode == other.PrimaryCurrencyCode
+                && this.SecondaryCurrencyCode == other.SecondaryCurrencyCode
+                && this.PriceOfPrimaryCurrency == other.PriceOfPrimaryCurrency
+                && this.Timestamp == other.Timestamp;
+        }
     }// end of class ExchangeRate
 
 }// end of namespace CurrencyMonitor.DataModels

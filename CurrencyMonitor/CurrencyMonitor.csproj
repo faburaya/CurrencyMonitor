@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="com.faburaya.Reusable.DataAccess" Version="1.0.3" />
+    <PackageReference Include="com.faburaya.Reusable.DataAccess" Version="2.1.2" />
     <PackageReference Include="jquery-globalize" Version="1.4.2" />
     <PackageReference Include="jQuery.Validation.Globalize" Version="1.1.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.5" />

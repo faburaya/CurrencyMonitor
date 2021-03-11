@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 using Newtonsoft.Json;
@@ -12,11 +13,10 @@ namespace CurrencyMonitor.DataModels
     /// das den Wechselkurs beobachtet.
     /// </summary>
     [CosmosContainer(Name = "Abonnement")]
-    public class SubscriptionForExchangeRate : CosmosDbItem
+    public class SubscriptionForExchangeRate
+        : CosmosDbItem<SubscriptionForExchangeRate>
+        , IEquatable<SubscriptionForExchangeRate>
     {
-        public override string PartitionKeyValue =>
-            CosmosDbPartitionedItem<SubscriptionForExchangeRate>.GetPartitionKeyValue(this);
-
         [Required]
         [Display(Name = "Bezeichnung")]
         [JsonProperty(PropertyName = "label")]
@@ -46,5 +46,16 @@ namespace CurrencyMonitor.DataModels
         [Column(TypeName = "decimal(10, 2)")]
         [JsonProperty(PropertyName = "targetPrice")]
         public decimal TargetPriceOfSellingCurrency { get; set; }
-    }
-}
+
+        public bool Equals(SubscriptionForExchangeRate other)
+        {
+            return this.Label == other.Label
+                && this.EMailAddress == other.EMailAddress
+                && this.CodeCurrencyToSell == other.CodeCurrencyToSell
+                && this.CodeCurrencyToBuy == other.CodeCurrencyToBuy
+                && this.TargetPriceOfSellingCurrency == other.TargetPriceOfSellingCurrency;
+        }
+
+    }// end of class SubscriptionForExchangeRate
+
+}// end of namespace CurrencyMonitor.DataModels

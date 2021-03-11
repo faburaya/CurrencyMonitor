@@ -17,8 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="com.faburaya.Reusable.DataAccess" Version="1.0.3" />
-    <PackageReference Include="com.faburaya.Reusable.DataModels" Version="1.0.3" />
+    <PackageReference Include="com.faburaya.Reusable.DataAccess" Version="2.1.2" />
+    <PackageReference Include="com.faburaya.Reusable.DataModels" Version="2.1.2" />
   </ItemGroup>
 
   <ItemGroup>
