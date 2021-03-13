@@ -35,7 +35,7 @@ namespace CurrencyMonitor.DataAccess
         /// <param name="exchange">Das Paar von Währungen, die den Wechselkurs bilden.</param>
         /// <returns></returns>
         /// <remarks>Diese implementierung setzt auf https://themoneyconverter.com/ </remarks>
-        public async Task<DataModels.ExchangeRate> GetLatestRateFor(DataModels.ExchangePair exchange)
+        public async Task<DataModels.ExchangeRate> GetLatestRateAsync(DataModels.ExchangePair exchange)
         {
             string url = $"https://themoneyconverter.com/DE/{exchange.PrimaryCurrencyCode}/{exchange.SecondaryCurrencyCode}";
             string hypertext = await _hypertextFetcher.DownloadFrom(url);

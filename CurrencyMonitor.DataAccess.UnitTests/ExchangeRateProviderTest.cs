@@ -35,7 +35,7 @@ namespace CurrencyMonitor.DataAccess.UnitTests
             var provider = new ExchangeRateProvider(mockHypertextFetcher.Object, mockExchangeRateReader.Object);
 
             var exception = Assert.Throws<AggregateException>(
-                () => provider.GetLatestRateFor(new DataModels.ExchangePair("EUR", "BRL")).Result
+                () => provider.GetLatestRateAsync(new DataModels.ExchangePair("EUR", "BRL")).Result
             );
             Assert.IsType<ApplicationException>(exception.InnerException);
 
@@ -70,7 +70,7 @@ namespace CurrencyMonitor.DataAccess.UnitTests
 
             Mock<IHypertextFetcher> mockHypertextFetcher = CreateMockForHypertextFetcher();
             var provider = new ExchangeRateProvider(mockHypertextFetcher.Object, mockExchangeRateReader.Object);
-            DataModels.ExchangeRate actualExchangeRate = provider.GetLatestRateFor(expectedExchange).Result;
+            DataModels.ExchangeRate actualExchangeRate = provider.GetLatestRateAsync(expectedExchange).Result;
 
             Assert.Equal(expectedExchange.PrimaryCurrencyCode, actualExchangeRate.PrimaryCurrencyCode);
             Assert.Equal(expectedExchange.SecondaryCurrencyCode, actualExchangeRate.SecondaryCurrencyCode);
