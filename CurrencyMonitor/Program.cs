@@ -25,7 +25,7 @@ namespace CurrencyMonitor
                     var dbService = serviceProvider.GetRequiredService<ICosmosDbService<DataModels.RecognizedCurrency>>();
 
                     var xmlDataLoader = new DataAccess.XmlDataLoader(
-                        new XmlMetadata(
+                        new Reusable.DataAccess.Common.XmlMetadata(
                             "http://www.currencymonitor.com/deployment",
                             System.IO.Path.Combine("Data", "deployment.xml"),
                             System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "deployment.xsd"))

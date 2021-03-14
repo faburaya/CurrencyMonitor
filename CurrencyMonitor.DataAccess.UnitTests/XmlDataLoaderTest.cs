@@ -4,6 +4,7 @@ using System.IO;
 using Moq;
 using Xunit;
 using Reusable.DataAccess;
+using Reusable.DataAccess.Common;
 
 namespace CurrencyMonitor.DataAccess.UnitTests
 {

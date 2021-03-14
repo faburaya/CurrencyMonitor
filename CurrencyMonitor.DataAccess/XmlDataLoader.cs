@@ -1,8 +1,7 @@
-﻿using System;
-using System.Xml;
-using System.Linq;
+﻿using System.Xml;
 
 using Reusable.DataAccess;
+using Reusable.DataAccess.Common;
 
 namespace CurrencyMonitor.DataAccess
 {

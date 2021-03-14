@@ -39,7 +39,7 @@ namespace CurrencyMonitor
             if (File.Exists(secretFilePath))
             {
                 secretLoader = new SecretLoader(
-                    new XmlMetadata(
+                    new Reusable.DataAccess.Common.XmlMetadata(
                         "http://dataaccess.reusable.faburaya.com/secrets",
                         secretFilePath,
                         Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Schema", "secrets.xsd"))
