@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using CommandLine;
 using CurrencyMonitor.DataModels;
 using CurrencyMonitor.DataAccess;
-using Microsoft.Azure.Cosmos;
 using Reusable.DataAccess;
 
 namespace CurrencyMonitor.ExchangeRateUpdateJob
@@ -81,7 +80,8 @@ namespace CurrencyMonitor.ExchangeRateUpdateJob
                 upsertTask.Wait();
                 if (upsertTask.Exception != null)
                 {
-                    Console.WriteLine($"GESCHEITERT! {upsertTask.Exception.InnerException.Message}");
+                    Console.WriteLine(
+                        $"GESCHEITERT!\n***\n{upsertTask.Exception.InnerException.Message}\n***");
                     continue;
                 }
 
