@@ -13,12 +13,14 @@ namespace CurrencyMonitor.DataModels
     [CosmosContainer(Name = "Wechselkurs")]
     public class ExchangeRate : CosmosDbItem<ExchangeRate>, IEquatable<ExchangeRate>
     {
-        public ExchangeRate(ExchangePair exchange, double rate)
+        public static ExchangeRate CreateFrom(ExchangePair exchange, double rate)
         {
-            this.PrimaryCurrencyCode = exchange.PrimaryCurrencyCode;
-            this.SecondaryCurrencyCode = exchange.SecondaryCurrencyCode;
-            this.PriceOfPrimaryCurrency = rate;
-            this.Timestamp = DateTime.Now.ToUniversalTime();
+            return new ExchangeRate {
+                PrimaryCurrencyCode = exchange.PrimaryCurrencyCode,
+                SecondaryCurrencyCode = exchange.SecondaryCurrencyCode,
+                PriceOfPrimaryCurrency = rate,
+                Timestamp = DateTime.Now.ToUniversalTime()
+            };
         }
 
         /// <summary>

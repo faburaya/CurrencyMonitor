@@ -72,11 +72,11 @@ namespace CurrencyMonitor.Controllers
             return View(new Models.SubscriptionViewModel(subscription, await getAllCurrencies));
         }
 
-        // GET: Subscriptions/Create
-        public IActionResult Create()
+        // GET: Subscriptions/Create?sell&buy
+        public IActionResult Create(string sell, string buy)
         {
             return View(
-                new Models.SubscriptionViewModel(null, GetAllRecognizedCurrenciesAsync().Result)
+                new Models.SubscriptionViewModel(sell, buy, GetAllRecognizedCurrenciesAsync().Result)
             );
         }
 

@@ -1,0 +1,46 @@
+﻿@model IEnumerable<CurrencyMonitor.Models.ExchangeRateViewModel>
+
+@{
+    ViewData["Title"] = "Wechselkurse";
+}
+
+<h1>Alle Wechselkurse</h1>
+
+<form asp-controller="ExchangeRates" asp-action="Index" method="get">
+    <p>
+        Mit der Währung: <input type="text" name="currencyFilter" />
+        <input type="submit" value="Filtern" />
+    </p>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ExchangeRate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Timestamp)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ExchangeRate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Timestamp)
+                </td>
+                <td>
+                    <a asp-controller="Subscriptions"
+                       asp-action="Create"
+                       asp-route-sell="@item.CodeOfSellingCurrency"
+                       asp-route-buy="@item.CodeOfBuyingCurrency">Abbonieren</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

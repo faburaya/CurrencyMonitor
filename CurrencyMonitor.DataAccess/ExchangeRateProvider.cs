@@ -46,7 +46,7 @@ namespace CurrencyMonitor.DataAccess
                 throw new ApplicationException($"Es ist nicht gelungen, den Wechselkurs aus {url} abzulesen!");
             }
 
-            return new DataModels.ExchangeRate(readExchange, rate);
+            return DataModels.ExchangeRate.CreateFrom(readExchange, rate);
         }
 
     }// end of class ExchangeRateProvider

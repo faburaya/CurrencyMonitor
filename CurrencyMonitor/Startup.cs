@@ -87,6 +87,7 @@ namespace CurrencyMonitor
 
             InjectCosmosDbService<DataModels.RecognizedCurrency>(services);
             InjectCosmosDbService<DataModels.SubscriptionForExchangeRate>(services);
+            InjectCosmosDbService<DataModels.ExchangeRate>(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

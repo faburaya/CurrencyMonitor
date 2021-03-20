@@ -7,11 +7,25 @@ namespace CurrencyMonitor.Models
 {
     /// <summary>
     /// View-Model des Abonnements für Beobachtung des Wechselkurses.
-    /// Die readonly Felder dienen spezifischen Voraussetzungen der Ansicht.
     /// </summary>
     public class SubscriptionViewModel : DataModels.SubscriptionForExchangeRate
     {
-        public SubscriptionViewModel(DataModels.SubscriptionForExchangeRate subscription, IEnumerable<DataModels.RecognizedCurrency> recognizedCurrencies)
+        private SubscriptionViewModel(IEnumerable<DataModels.RecognizedCurrency> recognizedCurrencies)
+        {
+            this.AvailableCurrencies = (from currency
+                                        in recognizedCurrencies
+                                        orderby currency.Code
+                                        select new SelectListItem
+                                        {
+                                            Value = currency.Code,
+                                            Text = $"{currency.Code} - {currency.Name}"
+                                        });
+        }
+
+        public SubscriptionViewModel(
+            DataModels.SubscriptionForExchangeRate subscription,
+            IEnumerable<DataModels.RecognizedCurrency> recognizedCurrencies)
+            : this(recognizedCurrencies)
         {
             if (subscription != null)
             {
@@ -22,15 +36,16 @@ namespace CurrencyMonitor.Models
                 this.CodeCurrencyToBuy = subscription.CodeCurrencyToBuy;
                 this.TargetPriceOfSellingCurrency = subscription.TargetPriceOfSellingCurrency; 
             }
+        }
 
-            this.AvailableCurrencies = (from currency
-                                        in recognizedCurrencies
-                                        orderby currency.Code
-                                        select new SelectListItem
-                                        {
-                                            Value = currency.Code,
-                                            Text = $"{currency.Code} - {currency.Name}"
-                                        });
+        public SubscriptionViewModel(
+            string codeCurrencyToSell,
+            string codeCurrencyToBuy,
+            IEnumerable<DataModels.RecognizedCurrency> recognizedCurrencies)
+            : this(recognizedCurrencies)
+        {
+            this.CodeCurrencyToSell = codeCurrencyToSell;
+            this.CodeCurrencyToBuy = codeCurrencyToBuy;
         }
 
         public IEnumerable<SelectListItem> AvailableCurrencies { get; }
@@ -46,5 +61,7 @@ namespace CurrencyMonitor.Models
         {
             get { return $"{TargetPriceOfSellingCurrency} {CodeCurrencyToBuy}"; }
         }
-    }
-}
+
+    }// end of class SubscriptionViewModel
+
+}// end of namespace CurrencyMonitor.Models
