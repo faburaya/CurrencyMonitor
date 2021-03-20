@@ -32,24 +32,25 @@ namespace CurrencyMonitor.Controllers
         {
             var getAllCurrencies = GetAllRecognizedCurrenciesAsync();
 
+            IEnumerable<DataModels.SubscriptionForExchangeRate> subscriptions;
             if (string.IsNullOrWhiteSpace(emailFilter))
             {
-                var allItems =
-                    await _dbServiceSubscriptions.QueryAsync(cosmos => cosmos.Select(item => item));
-                return View(
-                    allItems.Select(item => new Models.SubscriptionViewModel(item, getAllCurrencies.Result))
-                );
+                subscriptions = await
+                    _dbServiceSubscriptions.QueryAsync(cosmos => cosmos.Select(item => item));
             }
             else
             {
-                var filteredItems = await _dbServiceSubscriptions.QueryAsync(cosmos =>
+                emailFilter = emailFilter.ToLower();
+                subscriptions = await _dbServiceSubscriptions.QueryAsync(cosmos =>
                     cosmos.Where(item => item.EMailAddress.Contains(emailFilter))
                         .Select(item => item)
                 );
-                return View(
-                    filteredItems.Select(item => new Models.SubscriptionViewModel(item, getAllCurrencies.Result))
-                );
             }
+
+            return View(
+                from item in subscriptions
+                select new Models.SubscriptionViewModel(item, getAllCurrencies.Result)
+            );
         }
 
         // GET: Subscriptions/Details/partitionKey?id

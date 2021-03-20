@@ -13,6 +13,11 @@ namespace CurrencyMonitor.DataModels
     [CosmosContainer(Name = "Wechselkurs")]
     public class ExchangeRate : CosmosDbItem<ExchangeRate>, IEquatable<ExchangeRate>
     {
+        /// <remarks>
+        /// Hier erstellt man das Objekt durch eine statische Methode,
+        /// denn ein Konstruktor verursacht Probleme bei der Deserialisierung,
+        /// wenn man ein Element aus der Datenbank holt.
+        /// </remarks>
         public static ExchangeRate CreateFrom(ExchangePair exchange, double rate)
         {
             return new ExchangeRate {

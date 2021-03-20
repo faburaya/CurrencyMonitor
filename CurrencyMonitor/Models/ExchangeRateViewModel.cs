@@ -37,7 +37,7 @@ namespace CurrencyMonitor.Models
         [Display(Name = "Wechselkurs")]
         public string ExchangeRate { get; }
 
-        [Display(Name = "Letzte Erfassung")]
+        [Display(Name = "Letzte Erfassung (UTC)")]
         public DateTime Timestamp { get; }
     }
 }
