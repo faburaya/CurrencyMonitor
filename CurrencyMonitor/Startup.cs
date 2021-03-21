@@ -15,47 +15,16 @@ namespace CurrencyMonitor
 {
     public class Startup
     {
+        private readonly DataAccess.ConnectionStringProvider _connStringProvider;
+
+        private readonly IConfiguration _configuration;
+
         public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
-            Configuration = configuration;
-        }
-
-        public IConfiguration Configuration { get; }
-
-        /// <summary>
-        /// Ersetzt die herkömmliche Beschaffung der Verbindungszeichenfolge.
-        /// Die geheime Verbindungszeichenfolge kommt aus einer versteckten XML Datei.
-        /// Wenn solche Datei nicht vorhanden ist, holt es die Verbindungszeichenfolge
-        /// aus den Einstellungen der Anwendung heraus.
-        /// </summary>
-        /// <param name="connectionName">Der Name der Verbindung.</param>
-        /// <returns>
-        /// Die Verbindugszeichenfolge für die Datenbank im Einsatz, wenn vorhanden, andernfalls <c>null</c>.
-        /// </returns>
-        private string GetSecretConnectionString(string connectionName)
-        {
-            SecretLoader secretLoader = null;
-            string secretFilePath = Path.Combine("Data", "secrets.xml");
-            if (File.Exists(secretFilePath))
-            {
-                secretLoader = new SecretLoader(
-                    new Reusable.DataAccess.Common.XmlMetadata(
-                        "http://dataaccess.reusable.faburaya.com/secrets",
-                        secretFilePath,
-                        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Schema", "secrets.xsd"))
-                );
-            }
-
-            // versucht vorzugsweise die Verbindungszeichenkette aus den Geheimnissen herauszuholen:
-            string secret = secretLoader?.GetDatabaseConnString(connectionName);
-            if (secret != null)
-            {
-                return secret;
-            }
-
-            // ... andernfalls greift auf die herkömmliche Einstellungen zurück:
-            return Configuration.GetConnectionString(connectionName);
-            
+            _configuration = configuration;
+            _connStringProvider =
+                new DataAccess.ConnectionStringProvider(Path.Combine("Data", "secrets.xml"),
+                                                        configuration);
         }
 
         /// <summary>
@@ -66,8 +35,8 @@ namespace CurrencyMonitor
         private void InjectCosmosDbService<ItemType>(IServiceCollection services)
             where ItemType : CosmosDbItem<ItemType>, IEquatable<ItemType>
         {
-            string databaseName = Configuration.GetSection("CosmosDb").GetSection("DatabaseName").Value;
-            string connectionString = GetSecretConnectionString("CurrencyMonitorCosmos");
+            string databaseName = _configuration.GetSection("CosmosDb").GetSection("DatabaseName").Value;
+            string connectionString = _connStringProvider.GetSecretConnectionString("CurrencyMonitorCosmos");
 
             services.AddSingleton<ICosmosDbService<ItemType>>(
                 CosmosDbService<ItemType>

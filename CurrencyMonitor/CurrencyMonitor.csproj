@@ -24,9 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="C:\Users\felip\.nuget\packages\com.faburaya.reusable.dataaccess\1.0.3\contentFiles\any\netcoreapp3.1\Schema\secrets.xsd">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Update="C:\Users\felip\.nuget\packages\com.faburaya.reusable.dataaccess\3.0.3\contentFiles\any\netcoreapp3.1\Schema\secrets.xsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
