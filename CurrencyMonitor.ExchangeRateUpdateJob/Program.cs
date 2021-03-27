@@ -28,6 +28,9 @@ namespace CurrencyMonitor.ExchangeRateUpdateJob
                 })
                 .ConfigureLogging((context, loggingBuilder) => {
                     loggingBuilder.AddConsole();
+                    loggingBuilder.AddFilter(delegate (LogLevel level) {
+                        return level >= LogLevel.Trace;
+                    });
                 })
                 .ConfigureServices((context, serviceCollection) => {
                     var connStringProvider =

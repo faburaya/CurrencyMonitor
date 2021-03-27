@@ -28,18 +28,10 @@ namespace CurrencyMonitor.ExchangeRateUpdateJob
         public void RunOnSchedule(
             [TimerTrigger("0 */10 7-18 * * 1-5")] TimerInfo timer, ILogger log)
         {
-            if (timer.IsPastDue)
-            {
-                log.LogInformation("Timer löst die Ausführung der Funktion zu spät aus!");
-            }
-            log.LogInformation($"Funktion wird von dem Timer ausgeführt: {DateTime.Now}");
-
-            var exchangeRateIdGenerator = new ExchangeRateIdGenerator();
-
             // mittlerweile fährt den Anbieter für Wechselkurs im Voraus hoch
             var exchangeRateProvider = new ExchangeRateProvider();
 
-            log.LogInformation("Alle Abonnements für Wechselkurs werden abgerufen...");
+            log.LogTrace("Alle Abonnements für Wechselkurs werden abgerufen...");
             IEnumerable<SubscriptionForExchangeRate> allSubscriptions =
                 _subscriptionService.QueryAsync(source => source.Select(item => item)).Result;
 
@@ -49,7 +41,7 @@ namespace CurrencyMonitor.ExchangeRateUpdateJob
                 select new ExchangePair(subscription.CodeCurrencyToSell,
                                         subscription.CodeCurrencyToBuy)
             ).ToHashSet();
-            log.LogInformation($"Insgesamt {exchangePairs.Count} Wechselkurs(e) müssen erfasst werden.");
+            log.LogTrace($"Insgesamt {exchangePairs.Count} Wechselkurs(e) müssen erfasst werden.");
 
             // holt die Wechselkurse aus dem Internet:
             var exchangeRateRetrievals = from exchange in exchangePairs
@@ -58,13 +50,14 @@ namespace CurrencyMonitor.ExchangeRateUpdateJob
                                          into exchangeRateGroup
                                          select exchangeRateGroup;
 
+            var exchangeRateIdGenerator = new ExchangeRateIdGenerator();
+
             // speichert die erhaltenen Wechselkurse in der Datenbank:
             foreach (var retrievalGroup in exchangeRateRetrievals)
             {
-                log.LogInformation($"Es gibt {retrievalGroup.Count()} Wechselkurs(e) mit der Währung {retrievalGroup.Key}... ");
+                log.LogTrace($"Es gibt {retrievalGroup.Count()} Wechselkurs(e) mit der Währung {retrievalGroup.Key}... ");
 
                 Task.WaitAll(retrievalGroup.ToArray());
-                log.LogInformation("Erfasst.");
 
                 var items = retrievalGroup.Select(task => {
                     ExchangeRate exchangeRate = task.Result;
@@ -76,12 +69,12 @@ namespace CurrencyMonitor.ExchangeRateUpdateJob
                 upsertTask.Wait();
                 if (upsertTask.Exception != null)
                 {
-                    log.LogInformation(
+                    log.LogError(
                         $"GESCHEITERT!\n***\n{upsertTask.Exception.InnerException.Message}\n***");
                     continue;
                 }
 
-                log.LogInformation("Gespeichert :-)");
+                log.LogTrace("Gespeichert :-)");
             }
         }
 
