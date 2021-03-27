@@ -11,7 +11,10 @@ namespace CurrencyMonitor.DataAccess
 
         public static TimeSpan CalculateExponentialBackoff(TimeSpan timeSlot, uint attempt)
         {
-            return randomGenerator.Next(1 << (int)attempt) * timeSlot;
+            lock (randomGenerator)
+            {
+                return randomGenerator.Next(1 << (int)attempt) * timeSlot;
+            }
         }
     }
 }

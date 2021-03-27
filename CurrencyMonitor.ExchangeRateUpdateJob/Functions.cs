@@ -54,7 +54,7 @@ namespace CurrencyMonitor.ExchangeRateUpdateJob
             // speichert die erhaltenen Wechselkurse in der Datenbank:
             foreach (var retrievalGroup in exchangeRateRetrievals)
             {
-                log.LogTrace($"Es gibt {retrievalGroup.Count()} Wechselkurs(e) mit der Währung {retrievalGroup.Key}... ");
+                log.LogTrace($"Mit der Währung {retrievalGroup.Key} werden {retrievalGroup.Count()} Wechselkurse erfasst und in der Datenbank gespeichert...");
 
                 Task.WaitAll(retrievalGroup.ToArray());
 
@@ -72,8 +72,6 @@ namespace CurrencyMonitor.ExchangeRateUpdateJob
                         $"GESCHEITERT!\n***\n{upsertTask.Exception.InnerException.Message}\n***");
                     continue;
                 }
-
-                log.LogTrace("Gespeichert :-)");
             }
         }
 
