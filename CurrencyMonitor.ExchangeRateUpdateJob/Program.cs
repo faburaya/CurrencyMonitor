@@ -1,12 +1,14 @@
 ﻿using System;
-using System.Linq;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
-using CommandLine;
 using CurrencyMonitor.DataModels;
 using CurrencyMonitor.DataAccess;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Reusable.DataAccess;
+using Reusable.DataModels;
 
 namespace CurrencyMonitor.ExchangeRateUpdateJob
 {
@@ -16,77 +18,54 @@ namespace CurrencyMonitor.ExchangeRateUpdateJob
     /// </summary>
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main()
         {
-            var parsedArgs =
-                Parser.Default.ParseArguments<CommandLineOptions>(args) as Parsed<CommandLineOptions>;
+            var hostBuilder = new HostBuilder();
+            hostBuilder
+                .ConfigureWebJobs(jobsBuilder => {
+                    jobsBuilder.AddTimers();
+                })
+                .ConfigureLogging((context, loggingBuilder) => {
+                    loggingBuilder.AddConsole();
+                })
+                .ConfigureServices((context, serviceCollection) => {
+                    var connStringProvider =
+                        new ConnectionStringProvider("secrets.xml", context.Configuration);
 
-            if (parsedArgs == null)
-                return;
+                    InjectCosmosDbService<SubscriptionForExchangeRate>(
+                        serviceCollection, context.Configuration, connStringProvider);
 
-            Console.WriteLine("Job wird gestartet...");
-
-            // fährt den Dienst für Abonnements im Voraus und wartet darauf...
-            var createSubscriptionServiceTask = CosmosDbService<SubscriptionForExchangeRate>.InitializeCosmosClientInstanceAsync(parsedArgs.Value.DatabaseName, parsedArgs.Value.ConnectionString);
-
-            var exchangeRateIdGenerator = new ExchangeRateIdGenerator();
-
-            // mittlerweile fährt den Dienst für Wechselkurs im Voraus hoch
-            var createExchangeRateServiceTask = CosmosDbService<ExchangeRate>.InitializeCosmosClientInstanceAsync(
-                parsedArgs.Value.DatabaseName,
-                parsedArgs.Value.ConnectionString,
-                exchangeRateIdGenerator);
-
-            // mittlerweile fährt den Anbieter für Wechselkurs im Voraus hoch
-            var exchangeRateProvider = new ExchangeRateProvider();
-
-            using ICosmosDbService<SubscriptionForExchangeRate> subscriptionService = createSubscriptionServiceTask.Result;
-
-            Console.WriteLine("Alle Abonnements für Wechselkurs werden abgerufen...");
-            IEnumerable<SubscriptionForExchangeRate> allSubscriptions =
-                subscriptionService.QueryAsync(source => source.Select(item => item)).Result;
-
-            // sammelt jeden einzelnen Paar von Währungen:
-            ISet<ExchangePair> exchangePairs = (
-                from subscription in allSubscriptions
-                select new ExchangePair(subscription.CodeCurrencyToSell,
-                                        subscription.CodeCurrencyToBuy)
-            ).ToHashSet();
-            Console.WriteLine($"Insgesamt {exchangePairs.Count} Wechselkurs(e) müssen erfasst werden.");
-
-            // holt die Wechselkurse aus dem Internet:
-            var exchangeRateRetrievals = from exchange in exchangePairs
-                                         group exchangeRateProvider.GetLatestRateAsync(exchange)
-                                         by exchange.PrimaryCurrencyCode
-                                         into exchangeRateGroup
-                                         select exchangeRateGroup;
-
-            // speichert die erhaltenen Wechselkurse in der Datenbank:
-            using ICosmosDbService<ExchangeRate> exchangeRateService = createExchangeRateServiceTask.Result;
-            foreach (var retrievalGroup in exchangeRateRetrievals)
-            {
-                Console.Write($"Es gibt {retrievalGroup.Count()} Wechselkurs(e) mit der Währung {retrievalGroup.Key}... ");
-
-                Task.WaitAll(retrievalGroup.ToArray());
-                Console.Write("Erfasst... ");
-
-                var items = retrievalGroup.Select(task => {
-                    ExchangeRate exchangeRate = task.Result;
-                    exchangeRate.Id = exchangeRateIdGenerator.GenerateIdFor(exchangeRate);
-                    return exchangeRate;
+                    InjectCosmosDbService<ExchangeRate>(
+                        serviceCollection, context.Configuration, connStringProvider);
                 });
-                var upsertTask = exchangeRateService.UpsertBatchAsync(items);
 
-                upsertTask.Wait();
-                if (upsertTask.Exception != null)
-                {
-                    Console.WriteLine(
-                        $"GESCHEITERT!\n***\n{upsertTask.Exception.InnerException.Message}\n***");
-                    continue;
-                }
-
-                Console.WriteLine("Gespeichert :-)");
+            using (var host = hostBuilder.Build())
+            {
+                await host.RunAsync();
             }
+        }
+
+        /// <summary>
+        /// Injiziert den Service für Zugang auf Cosmos Datenbank.
+        /// </summary>
+        /// <typeparam name="ItemType">Der Typ des Elements, den der Service behandelt.</typeparam>
+        /// <param name="services">Die Sammlung, in der der Service injiziert wird.</param>
+        /// <param name="configuration">Gewährt die Einstellungen für die Anwendung.</param>
+        /// <param name="connStringProvider">Gewährt die Verbindugszeichenketten.</param>
+        private static void InjectCosmosDbService<ItemType>(IServiceCollection services,
+                                                            IConfiguration configuration,
+                                                            ConnectionStringProvider connStringProvider)
+            where ItemType : CosmosDbItem<ItemType>, IEquatable<ItemType>
+        {
+            string databaseName = configuration.GetSection("CosmosDb").GetSection("DatabaseName").Value;
+            string connectionString = connStringProvider.GetSecretConnectionString("CurrencyMonitorCosmos");
+
+            services.AddSingleton<ICosmosDbService<ItemType>>(
+                CosmosDbService<ItemType>
+                    .InitializeCosmosClientInstanceAsync(databaseName, connectionString)
+                    .GetAwaiter()
+                    .GetResult()
+            );
         }
 
     }// end of class Program
