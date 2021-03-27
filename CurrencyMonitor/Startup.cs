@@ -23,8 +23,7 @@ namespace CurrencyMonitor
         {
             _configuration = configuration;
             _connStringProvider =
-                new DataAccess.ConnectionStringProvider(Path.Combine("Data", "secrets.xml"),
-                                                        configuration);
+                new DataAccess.ConnectionStringProvider("secrets.xml", configuration);
         }
 
         /// <summary>
