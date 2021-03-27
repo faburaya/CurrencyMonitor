@@ -25,7 +25,6 @@ namespace CurrencyMonitor.ExchangeRateUpdateJob
             _exchangeRateService = exchangeRateService;
         }
 
-        [FunctionName("TimerAuslöserWechselkursAktualisierung")]
         public void RunOnSchedule(
             [TimerTrigger("0 */10 7-18 * * 1-5")] TimerInfo timer, ILogger log)
         {

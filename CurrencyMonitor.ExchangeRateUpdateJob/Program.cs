@@ -23,6 +23,7 @@ namespace CurrencyMonitor.ExchangeRateUpdateJob
             var hostBuilder = new HostBuilder();
             hostBuilder
                 .ConfigureWebJobs(jobsBuilder => {
+                    jobsBuilder.AddAzureStorageCoreServices();
                     jobsBuilder.AddTimers();
                 })
                 .ConfigureLogging((context, loggingBuilder) => {
