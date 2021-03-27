@@ -36,11 +36,12 @@ namespace CurrencyMonitor.ExchangeRateUpdateJob
                     var connStringProvider =
                         new ConnectionStringProvider("secrets.xml", context.Configuration);
 
-                    InjectCosmosDbService<SubscriptionForExchangeRate>(
-                        serviceCollection, context.Configuration, connStringProvider);
-
-                    InjectCosmosDbService<ExchangeRate>(
-                        serviceCollection, context.Configuration, connStringProvider);
+                    Task.WaitAll(new Task[] {
+                        InjectCosmosDbService<SubscriptionForExchangeRate>(
+                            serviceCollection, context.Configuration, connStringProvider),
+                        InjectCosmosDbService<ExchangeRate>(
+                            serviceCollection, context.Configuration, connStringProvider)
+                    });
                 });
 
             using (var host = hostBuilder.Build())
@@ -56,20 +57,19 @@ namespace CurrencyMonitor.ExchangeRateUpdateJob
         /// <param name="services">Die Sammlung, in der der Service injiziert wird.</param>
         /// <param name="configuration">Gewährt die Einstellungen für die Anwendung.</param>
         /// <param name="connStringProvider">Gewährt die Verbindugszeichenketten.</param>
-        private static void InjectCosmosDbService<ItemType>(IServiceCollection services,
-                                                            IConfiguration configuration,
-                                                            ConnectionStringProvider connStringProvider)
+        private static async Task InjectCosmosDbService<ItemType>(
+            IServiceCollection services,
+            IConfiguration configuration,
+            ConnectionStringProvider connStringProvider)
             where ItemType : CosmosDbItem<ItemType>, IEquatable<ItemType>
         {
             string databaseName = configuration.GetSection("CosmosDb").GetSection("DatabaseName").Value;
             string connectionString = connStringProvider.GetSecretConnectionString("CurrencyMonitorCosmos");
 
-            services.AddSingleton<ICosmosDbService<ItemType>>(
-                CosmosDbService<ItemType>
-                    .InitializeCosmosClientInstanceAsync(databaseName, connectionString)
-                    .GetAwaiter()
-                    .GetResult()
-            );
+            var service = await CosmosDbService<ItemType>
+                .InitializeCosmosClientInstanceAsync(databaseName, connectionString);
+
+            services.AddSingleton<ICosmosDbService<ItemType>>(service);
         }
 
     }// end of class Program
