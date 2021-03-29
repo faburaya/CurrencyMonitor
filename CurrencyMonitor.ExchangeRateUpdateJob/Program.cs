@@ -33,14 +33,11 @@ namespace CurrencyMonitor.ExchangeRateUpdateJob
                     });
                 })
                 .ConfigureServices((context, serviceCollection) => {
-                    var connStringProvider =
-                        new ConnectionStringProvider("secrets.xml", context.Configuration);
-
                     Task.WaitAll(new Task[] {
-                        InjectCosmosDbService<SubscriptionForExchangeRate>(
-                            serviceCollection, context.Configuration, connStringProvider),
-                        InjectCosmosDbService<ExchangeRate>(
-                            serviceCollection, context.Configuration, connStringProvider)
+                        InjectCosmosDbService<SubscriptionForExchangeRate>(serviceCollection,
+                                                                           context.Configuration),
+                        InjectCosmosDbService<ExchangeRate>(serviceCollection,
+                                                            context.Configuration)
                     });
                 });
 
@@ -59,12 +56,11 @@ namespace CurrencyMonitor.ExchangeRateUpdateJob
         /// <param name="connStringProvider">Gewährt die Verbindugszeichenketten.</param>
         private static async Task InjectCosmosDbService<ItemType>(
             IServiceCollection services,
-            IConfiguration configuration,
-            ConnectionStringProvider connStringProvider)
+            IConfiguration configuration)
             where ItemType : CosmosDbItem<ItemType>, IEquatable<ItemType>
         {
             string databaseName = configuration.GetSection("CosmosDb").GetSection("DatabaseName").Value;
-            string connectionString = connStringProvider.GetSecretConnectionString("CurrencyMonitorCosmos");
+            string connectionString = configuration.GetConnectionString("CurrencyMonitorCosmos");
 
             var service = await CosmosDbService<ItemType>
                 .InitializeCosmosClientInstanceAsync(databaseName, connectionString);

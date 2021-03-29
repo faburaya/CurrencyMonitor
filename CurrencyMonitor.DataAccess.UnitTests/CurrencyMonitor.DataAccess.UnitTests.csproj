@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="C:\Users\felip\.nuget\packages\com.faburaya.reusable.dataaccess\3.0.3\contentFiles\any\netcoreapp3.1\Schema\secrets.xsd" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="com.faburaya.Reusable.DataAccess" Version="3.0.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.1" />
     <PackageReference Include="Moq" Version="4.16.1" />

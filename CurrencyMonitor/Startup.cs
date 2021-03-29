@@ -14,15 +14,11 @@ namespace CurrencyMonitor
 {
     public class Startup
     {
-        private readonly DataAccess.ConnectionStringProvider _connStringProvider;
+        private readonly IConfiguration Configuration;
 
-        private readonly IConfiguration _configuration;
-
-        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
+        public Startup(IConfiguration configuration)
         {
-            _configuration = configuration;
-            _connStringProvider =
-                new DataAccess.ConnectionStringProvider("secrets.xml", configuration);
+            this.Configuration = configuration;
         }
 
         /// <summary>
@@ -33,8 +29,8 @@ namespace CurrencyMonitor
         private async Task InjectCosmosDbService<ItemType>(IServiceCollection services)
             where ItemType : CosmosDbItem<ItemType>, IEquatable<ItemType>
         {
-            string databaseName = _configuration.GetSection("CosmosDb").GetSection("DatabaseName").Value;
-            string connectionString = _connStringProvider.GetSecretConnectionString("CurrencyMonitorCosmos");
+            string databaseName = Configuration.GetSection("CosmosDb").GetSection("DatabaseName").Value;
+            string connectionString = Configuration.GetConnectionString("CurrencyMonitorCosmos");
 
             var service = await CosmosDbService<ItemType>
                 .InitializeCosmosClientInstanceAsync(databaseName, connectionString);

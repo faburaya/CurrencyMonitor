@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="C:\Users\felip\.nuget\packages\com.faburaya.reusable.dataaccess\3.0.3\contentFiles\any\netcoreapp3.1\Schema\secrets.xsd" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="Data\deployment.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -21,12 +25,6 @@
   <ItemGroup>
     <ProjectReference Include="..\CurrencyMonitor.DataAccess\CurrencyMonitor.DataAccess.csproj" />
     <ProjectReference Include="..\CurrencyMonitor.DataModels\CurrencyMonitor.DataModels.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Update="C:\Users\felip\.nuget\packages\com.faburaya.reusable.dataaccess\3.0.3\contentFiles\any\netcoreapp3.1\Schema\secrets.xsd">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 
 </Project>
