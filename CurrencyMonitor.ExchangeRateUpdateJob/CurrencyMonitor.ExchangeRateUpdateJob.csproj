@@ -1,15 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk;Microsoft.NET.Sdk.Publish">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Platforms>x64</Platforms>
   </PropertyGroup>
-
   <ItemGroup>
     <Content Remove="C:\Users\felip\.nuget\packages\com.faburaya.reusable.dataaccess\3.0.3\contentFiles\any\netcoreapp3.1\Schema\secrets.xsd" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="com.faburaya.Reusable.DataAccess" Version="3.0.3" />
     <PackageReference Include="com.faburaya.Reusable.DataModels" Version="2.1.2" />
@@ -18,16 +15,16 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="5.0.0" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\CurrencyMonitor.DataAccess\CurrencyMonitor.DataAccess.csproj" />
     <ProjectReference Include="..\CurrencyMonitor.DataModels\CurrencyMonitor.DataModels.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Settings.job">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
-
 </Project>
