@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 
 using CurrencyMonitor.DataModels;
-using CurrencyMonitor.DataAccess;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -22,17 +21,31 @@ namespace CurrencyMonitor.ExchangeRateUpdateJob
         {
             var hostBuilder = new HostBuilder();
             hostBuilder
-                .ConfigureWebJobs(jobsBuilder => {
+                .ConfigureWebJobs(jobsBuilder =>
+                {
                     jobsBuilder.AddAzureStorageCoreServices();
                     jobsBuilder.AddTimers();
                 })
-                .ConfigureLogging((context, loggingBuilder) => {
+                .ConfigureLogging((context, loggingBuilder) =>
+                {
                     loggingBuilder.AddConsole();
-                    loggingBuilder.AddFilter(delegate (LogLevel level) {
+
+                    // Wenn ein Schlüssel in den Einstellungen vorhanden ist,
+                    // macht sie zunutze, um Application Insights einzuschalten:
+                    string instrumentationKey = context.Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"];
+                    if (!string.IsNullOrEmpty(instrumentationKey))
+                    {
+                        loggingBuilder.AddApplicationInsightsWebJobs(
+                            options => options.InstrumentationKey = instrumentationKey);
+                    }
+
+                    loggingBuilder.AddFilter(delegate (LogLevel level)
+                    {
                         return level >= LogLevel.Trace;
                     });
                 })
-                .ConfigureServices((context, serviceCollection) => {
+                .ConfigureServices((context, serviceCollection) =>
+                {
                     Task.WaitAll(new Task[] {
                         InjectCosmosDbService<SubscriptionForExchangeRate>(serviceCollection,
                                                                            context.Configuration),
@@ -53,10 +66,8 @@ namespace CurrencyMonitor.ExchangeRateUpdateJob
         /// <typeparam name="ItemType">Der Typ des Elements, den der Service behandelt.</typeparam>
         /// <param name="services">Die Sammlung, in der der Service injiziert wird.</param>
         /// <param name="configuration">Gewährt die Einstellungen für die Anwendung.</param>
-        /// <param name="connStringProvider">Gewährt die Verbindugszeichenketten.</param>
-        private static async Task InjectCosmosDbService<ItemType>(
-            IServiceCollection services,
-            IConfiguration configuration)
+        private static async Task InjectCosmosDbService<ItemType>(IServiceCollection services,
+                                                                  IConfiguration configuration)
             where ItemType : CosmosDbItem<ItemType>, IEquatable<ItemType>
         {
             string databaseName = configuration.GetSection("CosmosDb").GetSection("DatabaseName").Value;
