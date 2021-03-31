@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CurrencyMonitor.DataAccess.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CurrencyMonitor.ExchangeRateUpdateJob", "CurrencyMonitor.ExchangeRateUpdateJob\CurrencyMonitor.ExchangeRateUpdateJob.csproj", "{5ADADD1D-9E45-4BDE-B35E-65B933F449A3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurrencyMonitor.ExchangeRateNotifierJob", "CurrencyMonitor.ExchangeRateNotifierJob\CurrencyMonitor.ExchangeRateNotifierJob.csproj", "{71FE9B65-F4D7-4258-9915-3A4E57E471BD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -38,6 +40,11 @@ Global
 		{5ADADD1D-9E45-4BDE-B35E-65B933F449A3}.Debug|x64.ActiveCfg = Debug|x64
 		{5ADADD1D-9E45-4BDE-B35E-65B933F449A3}.Debug|x64.Build.0 = Debug|x64
 		{5ADADD1D-9E45-4BDE-B35E-65B933F449A3}.Release|x64.ActiveCfg = Release|x64
+		{5ADADD1D-9E45-4BDE-B35E-65B933F449A3}.Release|x64.Build.0 = Release|x64
+		{71FE9B65-F4D7-4258-9915-3A4E57E471BD}.Debug|x64.ActiveCfg = Debug|x64
+		{71FE9B65-F4D7-4258-9915-3A4E57E471BD}.Debug|x64.Build.0 = Debug|x64
+		{71FE9B65-F4D7-4258-9915-3A4E57E471BD}.Release|x64.ActiveCfg = Release|x64
+		{71FE9B65-F4D7-4258-9915-3A4E57E471BD}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

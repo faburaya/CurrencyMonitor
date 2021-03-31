@@ -47,13 +47,17 @@ namespace CurrencyMonitor.DataModels
         [JsonProperty(PropertyName = "targetPrice")]
         public decimal TargetPriceOfSellingCurrency { get; set; }
 
+        [JsonProperty(PropertyName = "lastNotification")]
+        public DateTime LastNotification { get; set; }
+
         public bool Equals(SubscriptionForExchangeRate other)
         {
             return this.Label == other.Label
                 && this.EMailAddress == other.EMailAddress
                 && this.CodeCurrencyToSell == other.CodeCurrencyToSell
                 && this.CodeCurrencyToBuy == other.CodeCurrencyToBuy
-                && this.TargetPriceOfSellingCurrency == other.TargetPriceOfSellingCurrency;
+                && this.TargetPriceOfSellingCurrency == other.TargetPriceOfSellingCurrency
+                && this.LastNotification == other.LastNotification;
         }
 
     }// end of class SubscriptionForExchangeRate
