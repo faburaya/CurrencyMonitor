@@ -2,6 +2,8 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 
+using Reusable.Utils;
+
 namespace CurrencyMonitor.DataAccess
 {
     /// <summary>
@@ -16,9 +18,10 @@ namespace CurrencyMonitor.DataAccess
         static HypertextFetcher()
         {
             httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Add("user-agent", "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)");
+            httpClient.DefaultRequestHeaders.Add(
+                "user-agent", "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)");
 
-            timeSlotForRetry = new TimeSpan((long)(100 /*ms*/ * 1e4  /*ticks per ms*/));
+            timeSlotForRetry = new TimeSpan((long)(100 /*ms*/ * 1e4 /*ticks per ms*/));
         }
 
         private readonly uint _maxRetries;

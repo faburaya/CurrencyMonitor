@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+using CurrencyMonitor.DataModels;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Reusable.DataAccess;
-
-using CurrencyMonitor.DataModels;
+using Reusable.Utils;
 
 namespace CurrencyMonitor.ExchangeRateNotifierJob
 {

@@ -24,7 +24,18 @@ namespace CurrencyMonitor.DataModels
                 PrimaryCurrencyCode = exchange.PrimaryCurrencyCode,
                 SecondaryCurrencyCode = exchange.SecondaryCurrencyCode,
                 PriceOfPrimaryCurrency = rate,
-                Timestamp = DateTime.Now.ToUniversalTime()
+                Timestamp = DateTime.UtcNow.ToUniversalTime()
+            };
+        }
+
+        public ExchangeRate Revert()
+        {
+            return new ExchangeRate
+            {
+                PrimaryCurrencyCode = this.SecondaryCurrencyCode,
+                SecondaryCurrencyCode = this.PrimaryCurrencyCode,
+                PriceOfPrimaryCurrency = 1.0 / this.PriceOfPrimaryCurrency,
+                Timestamp = this.Timestamp
             };
         }
 

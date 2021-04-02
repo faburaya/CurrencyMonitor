@@ -1,7 +1,7 @@
 ﻿namespace CurrencyMonitor.ExchangeRateUpdateJob
 {
     internal class ExchangeRateIdGenerator
-        : Reusable.DataAccess.Common.UidGenerator<DataModels.ExchangeRate>
+        : Reusable.Utils.UidGenerator<DataModels.ExchangeRate>
     {
         public override string GenerateIdFor(DataModels.ExchangeRate obj)
         {
