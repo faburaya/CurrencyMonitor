@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <PackageReference Include="com.faburaya.Reusable.DataAccess" Version="3.1.3" />
-    <PackageReference Include="com.faburaya.Reusable.DataModels" Version="2.1.2" />
     <PackageReference Include="com.faburaya.Reusable.Utils" Version="3.1.2" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions" Version="4.0.1" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.CosmosDB" Version="3.0.10" />
@@ -24,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CurrencyMonitor.DataAccess\CurrencyMonitor.DataAccess.csproj" />
     <ProjectReference Include="..\CurrencyMonitor.DataModels\CurrencyMonitor.DataModels.csproj" />
+    <ProjectReference Include="..\CurrencyMonitor.ExchangeRateLogic\CurrencyMonitor.ExchangeRateLogic.csproj" />
   </ItemGroup>
 
   <ItemGroup>

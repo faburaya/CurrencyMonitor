@@ -1,10 +1,9 @@
-﻿using System;
-using System.Net.Mail;
+﻿using System.Net.Mail;
 
 using CurrencyMonitor.DataModels;
 using Reusable.Utils;
 
-namespace CurrencyMonitor.ExchangeRateNotifierJob
+namespace CurrencyMonitor.ExchangeRateLogic
 {
     /// <summary>
     /// Benachrichtigt den Abonnenten per E-Mail.
@@ -18,14 +17,16 @@ namespace CurrencyMonitor.ExchangeRateNotifierJob
         /// <summary>
         /// Erstellt ein neues Objekt.
         /// </summary>
-        /// <param name="relaySmtpServer">URL des Servers.</param>
+        /// <param name="host">URL des SMTP-Servers.</param>
+        /// <param name="port">TCP-Port des SMTP-Servers.</param>
         /// <param name="senderEmail">E-Mail-Adresse des Senders.</param>
-        public SubscriberMailer(string relaySmtpServer,
+        public SubscriberMailer(string host,
+                                int port,
                                 string senderEmail,
                                 PasswordBasedCredential credential)
         {
             _senderEmail = senderEmail;
-            _smtpClient = new SmtpClient(relaySmtpServer)
+            _smtpClient = new SmtpClient(host, port)
             {
                 UseDefaultCredentials = false,
                 Credentials = new System.Net.NetworkCredential(credential.UserId, credential.Password)
@@ -50,4 +51,4 @@ namespace CurrencyMonitor.ExchangeRateNotifierJob
 
     }// end of class SubscriberMailer
 
-}// end of namespace CurrencyMonitor.ExchangeRateNotifierJob
+}// end of namespace CurrencyMonitor.ExchangeRateLogic

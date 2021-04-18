@@ -54,6 +54,8 @@ namespace CurrencyMonitor.ExchangeRateNotifierJob
                         .GetResult();
 
                     serviceCollection.AddSingleton<ICosmosDbService<SubscriptionForExchangeRate>>(service);
+
+                    // TODO: Fügen SubscriberMailer hinzu!
                 });
 
             using (var host = hostBuilder.Build())

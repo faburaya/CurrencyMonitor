@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Reusable.DataAccess;
 using Reusable.Utils;
 using CurrencyMonitor.DataModels;
+using CurrencyMonitor.ExchangeRateLogic;
 
 namespace CurrencyMonitor.ExchangeRateNotifierJob
 {
@@ -15,8 +16,9 @@ namespace CurrencyMonitor.ExchangeRateNotifierJob
     /// </summary>
     public class Functions : NotificationLogic
     {
-        public Functions(ICosmosDbService<SubscriptionForExchangeRate> subscriptionService)
-            : base(subscriptionService)
+        public Functions(ICosmosDbService<SubscriptionForExchangeRate> subscriptionService,
+                         ISubscriberNotifier subscriberNotifier)
+            : base(subscriptionService, subscriberNotifier)
         {
         }
 

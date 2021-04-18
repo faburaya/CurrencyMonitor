@@ -24,8 +24,35 @@ namespace CurrencyMonitor.DataModels
                 PrimaryCurrencyCode = exchange.PrimaryCurrencyCode,
                 SecondaryCurrencyCode = exchange.SecondaryCurrencyCode,
                 PriceOfPrimaryCurrency = rate,
-                Timestamp = DateTime.UtcNow.ToUniversalTime()
+                Timestamp = DateTime.UtcNow
             };
+        }
+
+        /// <summary>
+        /// Hilft der Erstellung von einem Objekt, sodass man den Aufruf sich besser verstehen lässt.
+        /// Das verbessert die Lesbarkeit der Tests.
+        /// </summary>
+        /// <param name="amount1">Der Betrag in Währung 1.</param>
+        /// <param name="currencyCode1">Der Code für Währung 1.</param>
+        /// <param name="amount2">Der Betrag in Währung 2, der dem Betrag in Währung 1 entspricht.</param>
+        /// <param name="currencyCode2">Der Code für Währung 2.</param>
+        /// <returns>Der aus den angegebenen Parametern erstellte Wechselkurs.</returns>
+        public static ExchangeRate CreateFrom(double amount1, string currencyCode1,
+                                              double amount2, string currencyCode2)
+        {
+            var pair = new ExchangePair(currencyCode1, currencyCode2);
+            
+            double rate;
+            if (pair.PrimaryCurrencyCode == currencyCode1)
+            {
+                rate = amount2 / amount1;
+            }
+            else
+            {
+                rate = amount1 / amount2;
+            }
+
+            return CreateFrom(pair, rate);
         }
 
         public ExchangeRate Revert()

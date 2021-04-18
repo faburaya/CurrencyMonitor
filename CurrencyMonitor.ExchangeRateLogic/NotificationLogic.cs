@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using Reusable.DataAccess;
 using CurrencyMonitor.DataModels;
 
-namespace CurrencyMonitor.ExchangeRateNotifierJob
+namespace CurrencyMonitor.ExchangeRateLogic
 {
     /// <summary>
     /// Implementiert die Logik für Benachrichtigung der Abonnenten.
@@ -15,10 +15,13 @@ namespace CurrencyMonitor.ExchangeRateNotifierJob
     public class NotificationLogic
     {
         private readonly ICosmosDbService<SubscriptionForExchangeRate> _subscriptionService;
+        private readonly ISubscriberNotifier _subscriberNotifier;
 
-        public NotificationLogic(ICosmosDbService<SubscriptionForExchangeRate> subscriptionService)
+        public NotificationLogic(ICosmosDbService<SubscriptionForExchangeRate> subscriptionService,
+                                 ISubscriberNotifier subscriberNotifier)
         {
             _subscriptionService = subscriptionService;
+            _subscriberNotifier = subscriberNotifier;
         }
 
         /// <summary>
@@ -35,8 +38,8 @@ namespace CurrencyMonitor.ExchangeRateNotifierJob
                     item.CodeCurrencyToBuy == exchangeRate.PrimaryCurrencyCode
                         || item.CodeCurrencyToBuy == exchangeRate.SecondaryCurrencyCode)
                 .Select(item => item)
-            ).ContinueWith(antecendent =>
-            {
+            )
+            .ContinueWith(antecendent => {
                 IEnumerable<SubscriptionForExchangeRate> subscriptions = antecendent.Result;
                 var subscriptionsToNotify = from item in subscriptions
                                             where NeedsNotification(item, exchangeRate)
@@ -45,6 +48,7 @@ namespace CurrencyMonitor.ExchangeRateNotifierJob
                 foreach (SubscriptionForExchangeRate subscription in subscriptionsToNotify)
                 {
                     log.LogInformation($"Muss {subscription.EMailAddress} Bescheid geben.");
+                    _subscriberNotifier.Notify(subscription, exchangeRate);
                 }
             });
         }
@@ -63,7 +67,7 @@ namespace CurrencyMonitor.ExchangeRateNotifierJob
                 && subscription.CodeCurrencyToSell == exchangeRate.SecondaryCurrencyCode)
             {
                 decimal actualPriceToPay = new decimal(exchangeRate.PriceOfPrimaryCurrency);
-                decimal targetPriceToPay = subscription.TargetPriceOfSellingCurrency;
+                decimal targetPriceToPay = (decimal)1.0 / subscription.TargetPriceOfSellingCurrency;
                 return actualPriceToPay <= targetPriceToPay
                     && AreDifferentDays(exchangeRate.Timestamp, subscription.LastNotification);
             }
@@ -88,4 +92,4 @@ namespace CurrencyMonitor.ExchangeRateNotifierJob
 
     }// end of class NotificationLogic
 
-}
+}// end of namespace ExchangeRateLogic

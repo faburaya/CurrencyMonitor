@@ -1,6 +1,6 @@
 ﻿using CurrencyMonitor.DataModels;
 
-namespace CurrencyMonitor.ExchangeRateNotifierJob
+namespace CurrencyMonitor.ExchangeRateLogic
 {
     /// <summary>
     /// Schnittstelle für die Benachrichtigung der Abonnenten.
