@@ -2,18 +2,19 @@ using System;
 using System.Linq;
 
 using Xunit;
-using nDumbster.Smtp;
+using netDumbster.smtp;
 using CurrencyMonitor.DataModels;
 
 namespace CurrencyMonitor.ExchangeRateLogic.UnitTests
 {
     public class SubscriberMailerTest : IDisposable
     {
+        private const int _smtpServerPort = 25;
         private readonly SimpleSmtpServer _fakeSmtpServer;
 
         public SubscriberMailerTest()
         {
-            _fakeSmtpServer = SimpleSmtpServer.Start();
+            _fakeSmtpServer = SimpleSmtpServer.Start(_smtpServerPort);
         }
 
         public void Dispose()
@@ -48,7 +49,7 @@ namespace CurrencyMonitor.ExchangeRateLogic.UnitTests
                 Password = "Kennwort"
             };
             return new SubscriberMailer(
-                "localhost", _fakeSmtpServer.Port, _senderEmailAddress, credentials);
+                "localhost", _smtpServerPort, _senderEmailAddress, credentials);
         }
 
         [Fact]
@@ -78,8 +79,8 @@ namespace CurrencyMonitor.ExchangeRateLogic.UnitTests
             mailer.Notify(subscription, rate);
 
             Assert.Equal(1, _fakeSmtpServer.ReceivedEmailCount);
-            System.Net.Mail.MailMessage message = _fakeSmtpServer.ReceivedEmail.First();
-            Assert.Equal(subscription.EMailAddress, message.To.FirstOrDefault()?.ToString());
+            SmtpMessage message = _fakeSmtpServer.ReceivedEmail.First();
+            Assert.Equal(subscription.EMailAddress, message.ToAddresses.FirstOrDefault()?.ToString());
         }
 
     }// end of class SubscriberMailerTest
