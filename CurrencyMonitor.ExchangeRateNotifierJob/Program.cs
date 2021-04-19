@@ -1,11 +1,12 @@
 ﻿using System.Threading.Tasks;
 
-using CurrencyMonitor.DataModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Reusable.DataAccess;
+using CurrencyMonitor.DataModels;
+using CurrencyMonitor.ExchangeRateLogic;
 
 namespace CurrencyMonitor.ExchangeRateNotifierJob
 {
@@ -48,14 +49,25 @@ namespace CurrencyMonitor.ExchangeRateNotifierJob
                     string connectionString =
                         context.Configuration.GetConnectionString("CurrencyMonitorCosmos");
 
-                    var service = CosmosDbService<SubscriptionForExchangeRate>
+                    var cosmosDbService = CosmosDbService<SubscriptionForExchangeRate>
                         .InitializeCosmosClientInstanceAsync(databaseName, connectionString)
                         .GetAwaiter()
                         .GetResult();
 
-                    serviceCollection.AddSingleton<ICosmosDbService<SubscriptionForExchangeRate>>(service);
+                    serviceCollection.AddSingleton<ICosmosDbService<SubscriptionForExchangeRate>>(cosmosDbService);
 
-                    // TODO: Fügen SubscriberMailer hinzu!
+                    var smtpRelayConfig = context.Configuration.GetSection("SmtpRelay");
+                    int smtpPort = int.Parse(smtpRelayConfig.GetSection("Port").Value);
+                    string smtpHost = smtpRelayConfig.GetSection("Host").Value;
+
+                    var smtpCredential = new Reusable.Utils.PasswordBasedCredential {
+                        UserId = smtpRelayConfig.GetSection("UserID").Value,
+                       Password = smtpRelayConfig.GetSection("Password").Value
+                    };
+
+                    var mailerService = new SubscriberMailer(smtpHost, smtpPort, "exchange.rate.notifier@currencymonitor.de", smtpCredential);
+
+                    serviceCollection.AddSingleton<ISubscriberNotifier>(mailerService);
                 });
 
             using (var host = hostBuilder.Build())

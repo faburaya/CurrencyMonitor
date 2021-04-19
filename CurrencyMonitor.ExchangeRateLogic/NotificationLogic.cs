@@ -45,9 +45,9 @@ namespace CurrencyMonitor.ExchangeRateLogic
                                             where NeedsNotification(item, exchangeRate)
                                             select item;
 
+                log.LogInformation($"Muss {subscriptionsToNotify.Count()} Abonnenten Bescheid geben.");
                 foreach (SubscriptionForExchangeRate subscription in subscriptionsToNotify)
                 {
-                    log.LogInformation($"Muss {subscription.EMailAddress} Bescheid geben.");
                     _subscriberNotifier.Notify(subscription, exchangeRate);
                 }
             });

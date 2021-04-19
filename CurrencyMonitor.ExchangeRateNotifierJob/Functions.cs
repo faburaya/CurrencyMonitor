@@ -5,7 +5,6 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Reusable.DataAccess;
-using Reusable.Utils;
 using CurrencyMonitor.DataModels;
 using CurrencyMonitor.ExchangeRateLogic;
 
@@ -45,7 +44,7 @@ namespace CurrencyMonitor.ExchangeRateNotifierJob
                 return;
             }
 
-            var parallelTasks = new TaskQueue(_maxParallelTasks);
+            var parallelTasks = new Reusable.Utils.TaskQueue(_maxParallelTasks);
 
             // für jeden Wechselkurs, der aktualisiert wurde:
             foreach (Document document in input)
