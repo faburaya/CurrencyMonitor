@@ -149,7 +149,7 @@ namespace CurrencyMonitor.ExchangeRateLogic.UnitTests
                     CodeCurrencyToBuy = "BRL",
                     CodeCurrencyToSell = "EUR",
                     TargetPriceOfSellingCurrency = new decimal(7.0),
-                    LastNotification = DateTime.Today.ToUniversalTime()
+                    LastNotification = DateTime.UtcNow.Date // today (UTC)
                 },
             };
 
