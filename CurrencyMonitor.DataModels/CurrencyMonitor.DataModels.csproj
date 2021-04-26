@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="com.faburaya.Reusable.DataModels" Version="2.1.2" />
+    <PackageReference Include="com.faburaya.Reusable.DataModels" Version="2.1.4" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 

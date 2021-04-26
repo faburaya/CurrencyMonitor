@@ -58,7 +58,7 @@ namespace CurrencyMonitor.ExchangeRateLogic.UnitTests
             var notifierMock = CreateMockToNotify(new List<NotifyParams> { });
 
             var notificationLogic =
-                new NotificationLogic(cosmosDbServiceMock.Object, notifierMock.Object);
+                new SubscriberNotificationLogic(cosmosDbServiceMock.Object, notifierMock.Object);
 
             var exchangeRate = ExchangeRate.CreateFrom(1.0, "EUR", 1.0, "BRL");
 
@@ -88,7 +88,7 @@ namespace CurrencyMonitor.ExchangeRateLogic.UnitTests
             var notifierMock = CreateMockToNotify(new List<NotifyParams> { });
 
             var notificationLogic =
-                new NotificationLogic(cosmosDbServiceMock.Object, notifierMock.Object);
+                new SubscriberNotificationLogic(cosmosDbServiceMock.Object, notifierMock.Object);
 
             var exchangeRate = ExchangeRate.CreateFrom(1.0, "EUR", 1.0, "BRL");
 
@@ -161,7 +161,7 @@ namespace CurrencyMonitor.ExchangeRateLogic.UnitTests
             });
 
             var notificationLogic =
-                new NotificationLogic(cosmosDbServiceMock.Object, notifierMock.Object);
+                new SubscriberNotificationLogic(cosmosDbServiceMock.Object, notifierMock.Object);
 
             notificationLogic
                 .VerifyExchangeRateAgainstSubscriptionsAndNotify(exchangeRate, _loggerMock.Object)

@@ -13,7 +13,7 @@ namespace CurrencyMonitor.ExchangeRateNotifierJob
     /// <summary>
     /// Veröffentlicht Funktionen, die von dem Webauftrag ausgeführt werden müssen.
     /// </summary>
-    public class Functions : NotificationLogic
+    public class Functions : SubscriberNotificationLogic
     {
         public Functions(ICosmosDbService<SubscriptionForExchangeRate> subscriptionService,
                          ISubscriberNotifier subscriberNotifier)

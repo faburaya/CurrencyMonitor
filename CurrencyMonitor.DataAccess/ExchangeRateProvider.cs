@@ -6,7 +6,7 @@ namespace CurrencyMonitor.DataAccess
     /// <summary>
     /// Bietet den Wechselkurs aus dem Internet an.
     /// </summary>
-    public class ExchangeRateProvider
+    public class ExchangeRateProvider : IExchangeRateProvider
     {
         private IHypertextFetcher _hypertextFetcher;
 

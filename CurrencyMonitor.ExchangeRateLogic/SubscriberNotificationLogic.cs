@@ -12,13 +12,14 @@ namespace CurrencyMonitor.ExchangeRateLogic
     /// <summary>
     /// Implementiert die Logik für Benachrichtigung der Abonnenten.
     /// </summary>
-    public class NotificationLogic
+    public class SubscriberNotificationLogic
     {
         private readonly ICosmosDbService<SubscriptionForExchangeRate> _subscriptionService;
         private readonly ISubscriberNotifier _subscriberNotifier;
 
-        public NotificationLogic(ICosmosDbService<SubscriptionForExchangeRate> subscriptionService,
-                                 ISubscriberNotifier subscriberNotifier)
+        public SubscriberNotificationLogic(
+            ICosmosDbService<SubscriptionForExchangeRate> subscriptionService,
+            ISubscriberNotifier subscriberNotifier)
         {
             _subscriptionService = subscriptionService;
             _subscriberNotifier = subscriberNotifier;
@@ -31,7 +32,8 @@ namespace CurrencyMonitor.ExchangeRateLogic
         /// <param name="exchangeRate">Der veränderte Wechselkurs.</param>
         /// <param name="log">Gewährt Protokollierung.</param>
         /// <returns>Diese Aufgabe, die asynchron läuft.</returns>
-        public Task VerifyExchangeRateAgainstSubscriptionsAndNotify(ExchangeRate exchangeRate, ILogger log)
+        public Task VerifyExchangeRateAgainstSubscriptionsAndNotify(ExchangeRate exchangeRate,
+                                                                    ILogger log)
         {
             return _subscriptionService.QueryAsync(source =>
                 source.Where(item =>
@@ -90,6 +92,6 @@ namespace CurrencyMonitor.ExchangeRateLogic
             return a.Year != b.Year || a.DayOfYear != b.DayOfYear;
         }
 
-    }// end of class NotificationLogic
+    }// end of class SubscriberNotificationLogic
 
 }// end of namespace ExchangeRateLogic

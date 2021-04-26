@@ -11,7 +11,8 @@ namespace CurrencyMonitor.DataModels
     /// Hält einen Wert des Wechselkurses.
     /// </summary>
     [CosmosContainer(Name = "Wechselkurs")]
-    public class ExchangeRate : CosmosDbItem<ExchangeRate>, IEquatable<ExchangeRate>
+    public class ExchangeRate
+        : CosmosDbItem<ExchangeRate>, IEquatable<ExchangeRate>, IComparable<ExchangeRate>
     {
         /// <remarks>
         /// Hier erstellt man das Objekt durch eine statische Methode,
@@ -103,6 +104,30 @@ namespace CurrencyMonitor.DataModels
                 && this.PriceOfPrimaryCurrency == other.PriceOfPrimaryCurrency
                 && this.Timestamp == other.Timestamp;
         }
+
+        public int CompareTo(ExchangeRate other)
+        {
+            int comparison;
+
+            comparison = this.PrimaryCurrencyCode.CompareTo(other.PrimaryCurrencyCode);
+            if (comparison != 0)
+                return comparison;
+
+            comparison = this.SecondaryCurrencyCode.CompareTo(other.SecondaryCurrencyCode);
+            if (comparison != 0)
+                return comparison;
+
+            comparison = this.PriceOfPrimaryCurrency.CompareTo(other.PriceOfPrimaryCurrency);
+            if (comparison != 0)
+                return comparison;
+
+            comparison = this.Timestamp.CompareTo(other.Timestamp);
+            if (comparison != 0)
+                return comparison;
+
+            return this.Id.CompareTo(other.Id);
+        }
+
     }// end of class ExchangeRate
 
 }// end of namespace CurrencyMonitor.DataModels
