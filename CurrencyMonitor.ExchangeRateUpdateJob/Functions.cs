@@ -10,9 +10,10 @@ namespace CurrencyMonitor.ExchangeRateUpdateJob
 {
     public class Functions : ExchangeRateUpdateLogic
     {
-        public Functions(ICosmosDbService<SubscriptionForExchangeRate> subscriptionService,
+        public Functions(IExchangeRateProvider exchangeRateProvider,
+                         ICosmosDbService<SubscriptionForExchangeRate> subscriptionService,
                          ICosmosDbService<ExchangeRate> exchangeRateService)
-            : base(new ExchangeRateProvider(), subscriptionService, exchangeRateService)
+            : base(exchangeRateProvider, subscriptionService, exchangeRateService)
         {
         }
 

@@ -50,14 +50,13 @@ namespace CurrencyMonitor.ExchangeRateUpdateJob
                         InjectCosmosDbService<SubscriptionForExchangeRate>(serviceCollection,
                                                                            context.Configuration),
                         InjectCosmosDbService<ExchangeRate>(serviceCollection,
-                                                            context.Configuration)
+                                                            context.Configuration),
+                        InjectExchangeRateProvider(serviceCollection),
                     });
                 });
 
-            using (var host = hostBuilder.Build())
-            {
-                await host.RunAsync();
-            }
+            using IHost host = hostBuilder.Build();
+            await host.RunAsync();
         }
 
         /// <summary>
@@ -77,6 +76,19 @@ namespace CurrencyMonitor.ExchangeRateUpdateJob
                 .InitializeCosmosClientInstanceAsync(databaseName, connectionString);
 
             services.AddSingleton<ICosmosDbService<ItemType>>(service);
+        }
+
+        /// <summary>
+        /// Injiziert den Service, der die akuellsten Wechselkurse anbietet.
+        /// </summary>
+        /// <param name="services">Die Sammlung, in der der Service injiziert wird.</param>
+        private static async Task InjectExchangeRateProvider(IServiceCollection services)
+        {
+            await Task.Run(() =>
+            {
+                var provider = new DataAccess.ExchangeRateProvider();
+                services.AddSingleton<DataAccess.IExchangeRateProvider>(provider);
+            });
         }
 
     }// end of class Program
